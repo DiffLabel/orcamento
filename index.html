@@ -21,7 +21,7 @@
       margin-top: 4px;
     }
     button {
-      margin-top: 20px;
+      margin-top: 15px;
       padding: 10px;
       width: 100%;
       background-color: #1a73e8;
@@ -38,6 +38,18 @@
       margin-top: 20px;
       border-radius: 6px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    a#btnWhats {
+      display: none;
+      text-align: center;
+      text-decoration: none;
+      background-color: #25D366;
+      color: white;
+      padding: 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
     }
   </style>
 </head>
@@ -82,10 +94,10 @@
     </select>
 
     <button type="button" onclick="calcularOrcamento()">Calcular Orçamento</button>
-    <button type="button" onclick="gerarPDF()">Gerar PDF</button>
   </form>
 
   <div id="resultado"></div>
+  <a id="btnWhats" target="_blank">Enviar pelo WhatsApp</a>
 
   <script>
     let dadosOrcamento = {};
@@ -144,6 +156,18 @@
         <p><strong>Valor Unitário:</strong> R$ ${valorUnitario.toFixed(2)}</p>
         <p><strong>Valor por Milheiro:</strong> R$ ${valorMilheiro.toFixed(2)}</p>
       `;
+
+      gerarPDF();
+      gerarLinkWhatsApp();
+    }
+
+    function gerarLinkWhatsApp() {
+      const texto = `Orçamento #${dadosOrcamento.numOrcamento}%0ACliente: ${dadosOrcamento.nome}%0AEmail: ${dadosOrcamento.email}%0AMaterial: ${dadosOrcamento.material}%0AAcabamento: ${dadosOrcamento.acabamento}%0AÁrea: ${dadosOrcamento.areaTotal.toFixed(2)} m²%0AQuantidade: ${dadosOrcamento.quantidade}%0AValor Total: R$ ${dadosOrcamento.valorTotal.toFixed(2)}`;
+      const numero = ""; // Se quiser fixar, ex: "5547999999999"
+      const url = `https://wa.me/${numero}?text=${texto}`;
+      const btn = document.getElementById("btnWhats");
+      btn.href = url;
+      btn.style.display = "block";
     }
 
     async function gerarPDF() {
