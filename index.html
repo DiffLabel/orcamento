@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 700px;
+      max-width: 800px;
       margin: 40px auto;
       padding: 20px;
       background: #f9f9f9;
@@ -65,10 +65,10 @@
     <label>E-mail:</label>
     <input type="email" id="emailCliente" required>
 
-    <label>Largura (cm):</label>
+    <label>Largura (mm):</label>
     <input type="number" id="largura" required>
 
-    <label>Altura (cm):</label>
+    <label>Altura (mm):</label>
     <input type="number" id="altura" required>
 
     <label>Quantidade:</label>
@@ -79,18 +79,40 @@
 
     <label>Material:</label>
     <select id="material">
-      <option>Vinil Branco</option>
-      <option>Transparente</option>
-      <option>Couchê</option>
-      <option>Metalizado</option>
+      <option>ad couche</option>
+      <option>bopp branco fosco</option>
+      <option>bopp brilho</option>
+      <option>bopp metalizado</option>
+      <option>bopp transparente</option>
+      <option>bopp holografico</option>
+      <option>vinil fosco</option>
+      <option>vinil amarelo</option>
+      <option>vinil preto</option>
+      <option>vinil brilho</option>
+      <option>vinil refletivo</option>
+      <option>vinil transparente</option>
     </select>
 
     <label>Acabamento:</label>
     <select id="acabamento">
-      <option>Sem acabamento</option>
-      <option>Brilho</option>
-      <option>Fosco</option>
-      <option>Laminação</option>
+      <option>em cartela</option>
+      <option>em rolo/bobina</option>
+      <option>rolo/bobina com laminação fosca</option>
+      <option>rolo/bobina com laminação brilho</option>
+    </select>
+
+    <label>Tipo de Cola:</label>
+    <select id="cola">
+      <option>cola acrilica</option>
+      <option>cola borracha</option>
+      <option>cola removivel</option>
+    </select>
+
+    <label>Cores:</label>
+    <select id="cores">
+      <option>1x0 (preto)</option>
+      <option>4x0 (CMYK)</option>
+      <option>5x0 (CMYK + Branco)</option>
     </select>
 
     <button type="button" onclick="calcularOrcamento()">Calcular Orçamento</button>
@@ -115,21 +137,23 @@
       const numOrcamento = document.getElementById('numOrcamento').value;
       const nome = document.getElementById('nomeCliente').value;
       const email = document.getElementById('emailCliente').value;
-      const largura = parseFloat(document.getElementById('largura').value) + 0.3;
-      const altura = parseFloat(document.getElementById('altura').value) + 0.3;
+      const largura = parseFloat(document.getElementById('largura').value) + 3;
+      const altura = parseFloat(document.getElementById('altura').value) + 3;
       const quantidade = parseInt(document.getElementById('quantidade').value);
       const precoM2 = parseFloat(document.getElementById('precoM2').value);
       const material = document.getElementById('material').value;
       const acabamento = document.getElementById('acabamento').value;
+      const cola = document.getElementById('cola').value;
+      const cores = document.getElementById('cores').value;
 
-      const areaCm = largura * altura;
-      const areaM2 = areaCm / 10000;
+      const areaMM = largura * altura;
+      const areaM2 = areaMM / 1000000;
       const areaTotal = areaM2 * quantidade;
 
       let valorTotal;
       let regraEspecial = false;
 
-      if (material.toLowerCase().includes("vinil") && areaTotal < 5 && quantidade <= 2000) {
+      if (material.includes("vinil") && areaTotal < 5 && quantidade <= 2000) {
         valorTotal = 225;
         regraEspecial = true;
       } else {
@@ -141,20 +165,21 @@
 
       dadosOrcamento = {
         numOrcamento, nome, email, largura, altura, quantidade, precoM2,
-        material, acabamento, areaTotal, valorTotal, valorUnitario, valorMilheiro, regraEspecial
+        material, acabamento, cola, cores, areaTotal, valorTotal, valorUnitario, valorMilheiro, regraEspecial
       };
 
       document.getElementById('resultado').innerHTML = `
         <h3>Resumo do Orçamento</h3>
         <p><strong>Nº Orçamento:</strong> ${numOrcamento}</p>
         <p><strong>Cliente:</strong> ${nome}</p>
-        <p><strong>E-mail:</strong> ${email}</p>
         <p><strong>Material:</strong> ${material}</p>
         <p><strong>Acabamento:</strong> ${acabamento}</p>
+        <p><strong>Tipo de Cola:</strong> ${cola}</p>
+        <p><strong>Cores:</strong> ${cores}</p>
         <p><strong>Área Total:</strong> ${areaTotal.toFixed(2)} m²</p>
         <p><strong>Valor Total:</strong> R$ ${valorTotal.toFixed(2)} ${regraEspecial ? '(Valor fixo)' : ''}</p>
-        <p><strong>Valor Unitário:</strong> R$ ${valorUnitario.toFixed(2)}</p>
-        <p><strong>Valor por Milheiro:</strong> R$ ${valorMilheiro.toFixed(2)}</p>
+        <p><strong>Unitário:</strong> R$ ${valorUnitario.toFixed(2)}</p>
+        <p><strong>Milheiro:</strong> R$ ${valorMilheiro.toFixed(2)}</p>
       `;
 
       gerarPDF();
@@ -162,9 +187,8 @@
     }
 
     function gerarLinkWhatsApp() {
-      const texto = `Orçamento #${dadosOrcamento.numOrcamento}%0ACliente: ${dadosOrcamento.nome}%0AEmail: ${dadosOrcamento.email}%0AMaterial: ${dadosOrcamento.material}%0AAcabamento: ${dadosOrcamento.acabamento}%0AÁrea: ${dadosOrcamento.areaTotal.toFixed(2)} m²%0AQuantidade: ${dadosOrcamento.quantidade}%0AValor Total: R$ ${dadosOrcamento.valorTotal.toFixed(2)}`;
-      const numero = ""; // Se quiser fixar, ex: "5547999999999"
-      const url = `https://wa.me/${numero}?text=${texto}`;
+      const texto = `Orçamento #${dadosOrcamento.numOrcamento}%0ACliente: ${dadosOrcamento.nome}%0AMaterial: ${dadosOrcamento.material}%0AAcabamento: ${dadosOrcamento.acabamento}%0ACola: ${dadosOrcamento.cola}%0ACores: ${dadosOrcamento.cores}%0AÁrea: ${dadosOrcamento.areaTotal.toFixed(2)} m²%0AQuantidade: ${dadosOrcamento.quantidade}%0ATotal: R$ ${dadosOrcamento.valorTotal.toFixed(2)}`;
+      const url = `https://wa.me/?text=${texto}`;
       const btn = document.getElementById("btnWhats");
       btn.href = url;
       btn.style.display = "block";
@@ -186,21 +210,18 @@
       doc.setFont("Helvetica", "normal");
       doc.text(`Nº Orçamento: ${dadosOrcamento.numOrcamento}`, 20, 45);
       doc.text(`Cliente: ${dadosOrcamento.nome}`, 20, 53);
-      doc.text(`E-mail: ${dadosOrcamento.email}`, 20, 61);
+      doc.text(`Email: ${dadosOrcamento.email}`, 20, 61);
       doc.text(`Material: ${dadosOrcamento.material}`, 20, 69);
       doc.text(`Acabamento: ${dadosOrcamento.acabamento}`, 20, 77);
-      doc.text(`Tamanho: ${dadosOrcamento.largura.toFixed(1)} x ${dadosOrcamento.altura.toFixed(1)} cm`, 20, 85);
-      doc.text(`Quantidade: ${dadosOrcamento.quantidade}`, 20, 93);
-      doc.text(`Área Total: ${dadosOrcamento.areaTotal.toFixed(2)} m²`, 20, 101);
-      if (!dadosOrcamento.regraEspecial) {
-        doc.text(`Preço por m²: R$ ${dadosOrcamento.precoM2.toFixed(2)}`, 20, 109);
-      } else {
-        doc.text(`* Valor fixo aplicado (R$225)`, 20, 109);
-      }
+      doc.text(`Cola: ${dadosOrcamento.cola}`, 20, 85);
+      doc.text(`Cores: ${dadosOrcamento.cores}`, 20, 93);
+      doc.text(`Tamanho: ${dadosOrcamento.largura} x ${dadosOrcamento.altura} mm`, 20, 101);
+      doc.text(`Quantidade: ${dadosOrcamento.quantidade}`, 20, 109);
+      doc.text(`Área Total: ${dadosOrcamento.areaTotal.toFixed(2)} m²`, 20, 117);
       doc.setFont("Helvetica", "bold");
-      doc.text(`Total: R$ ${dadosOrcamento.valorTotal.toFixed(2)}`, 20, 125);
-      doc.text(`Unitário: R$ ${dadosOrcamento.valorUnitario.toFixed(2)}`, 20, 133);
-      doc.text(`Milheiro: R$ ${dadosOrcamento.valorMilheiro.toFixed(2)}`, 20, 141);
+      doc.text(`Total: R$ ${dadosOrcamento.valorTotal.toFixed(2)}`, 20, 133);
+      doc.text(`Unitário: R$ ${dadosOrcamento.valorUnitario.toFixed(2)}`, 20, 141);
+      doc.text(`Milheiro: R$ ${dadosOrcamento.valorMilheiro.toFixed(2)}`, 20, 149);
 
       doc.save(`Orcamento_${dadosOrcamento.numOrcamento}.pdf`);
     }
