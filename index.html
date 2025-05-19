@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Orçamento - Diff Label</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+    h1, h3 { text-align: center; }
+    label { display: block; margin-top: 12px; font-weight: bold; }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover { background-color: #0f5cc8; }
+    #resultado {
+      background-color: #fff;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>Orçamento - Diff Label</h1>
+  <form id="form-orcamento">
+    <label>Nº do Orçamento:</label>
+    <input type="text" id="numOrcamento" readonly>
+
+    <label>Nome do Cliente:</label>
+    <input type="text" id="nomeCliente" required>
+
+    <label>E-mail:</label>
+    <input type="email" id="emailCliente" required>
+
+    <label>Largura (cm):</label>
+    <input type="number" id="largura" required>
+
+    <label>Altura (cm):</label>
+    <input type="number" id="altura" required>
+
+    <label>Quantidade:</label>
+    <input type="number" id="quantidade" required>
+
+    <label>Preço por m² (R$):</label>
+    <input type="number" id="precoM2" required step="0.01">
+
+    <label>Material:</label>
+    <select id="material">
+      <option>Vinil Branco</option>
+      <option>Transparente</option>
+      <option>Couchê</option>
+      <option>Metalizado</option>
+    </select>
+
+    <label>Acabamento:</label>
+    <select id="acabamento">
+      <option>Sem acabamento</option>
+      <option>Brilho</option>
+      <option>Fosco</option>
+      <option>Laminação</option>
+    </select>
+
+    <button type="button" onclick="calcularOrcamento()">Calcular Orçamento</button>
+    <button type="button" onclick="gerarPDF()">Gerar PDF</button>
+  </form>
+
+  <div id="resultado"></div>
+
+  <script>
+    let dadosOrcamento = {};
+
+    function gerarNumeroOrcamento() {
+      let ultimoNumero = localStorage.getItem('ultimoOrcamento');
+      if (!ultimoNumero) ultimoNumero = 1;
+      else ultimoNumero = parseInt(ultimoNumero) + 1;
+      localStorage.setItem('ultimoOrcamento', ultimoNumero);
+      document.getElementById('numOrcamento').value = String(ultimoNumero).padStart(4, '0');
+    }
+    window.onload = gerarNumeroOrcamento;
+
+    function calcularOrcamento() {
+      const numOrcamento = document.getElementById('numOrcamento').value;
+      const nome = document.getElementById('nomeCliente').value;
+      const email = document.getElementById('emailCliente').value;
+      const largura = parseFloat(document.getElementById('largura').value) + 0.3;
+      const altura = parseFloat(document.getElementById('altura').value) + 0.3;
+      const quantidade = parseInt(document.getElementById('quantidade').value);
+      const precoM2 = parseFloat(document.getElementById('precoM2').value);
+      const material = document.getElementById('material').value;
+      const acabamento = document.getElementById('acabamento').value;
+
+      const areaCm = largura * altura;
+      const areaM2 = areaCm / 10000;
+      const areaTotal = areaM2 * quantidade;
+
+      let valorTotal;
+      let regraEspecial = false;
+
+      if (material.toLowerCase().includes("vinil") && areaTotal < 5 && quantidade <= 2000) {
+        valorTotal = 225;
+        regraEspecial = true;
+      } else {
+        valorTotal = areaTotal * precoM2;
+      }
+
+      const valorUnitario = valorTotal / quantidade;
+      const valorMilheiro = valorUnitario * 1000;
+
+      dadosOrcamento = {
+        numOrcamento, nome, email, largura, altura, quantidade, precoM2,
+        material, acabamento, areaTotal, valorTotal, valorUnitario, valorMilheiro, regraEspecial
+      };
+
+      document.getElementById('resultado').innerHTML = `
+        <h3>Resumo do Orçamento</h3>
+        <p><strong>Nº Orçamento:</strong> ${numOrcamento}</p>
+        <p><strong>Cliente:</strong> ${nome}</p>
+        <p><strong>E-mail:</strong> ${email}</p>
+        <p><strong>Material:</strong> ${material}</p>
+        <p><strong>Acabamento:</strong> ${acabamento}</p>
+        <p><strong>Área Total:</strong> ${areaTotal.toFixed(2)} m²</p>
+        <p><strong>Valor Total:</strong> R$ ${valorTotal.toFixed(2)} ${regraEspecial ? '(Valor fixo)' : ''}</p>
+        <p><strong>Valor Unitário:</strong> R$ ${valorUnitario.toFixed(2)}</p>
+        <p><strong>Valor por Milheiro:</strong> R$ ${valorMilheiro.toFixed(2)}</p>
+      `;
+    }
+
+    async function gerarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFont("Helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("Diff Comércio de Papeis e Embalagens LTDA", 20, 20);
+      doc.setFontSize(10);
+      doc.text("CNPJ: 18.678.030/0001-17", 20, 26);
+      doc.text("Rua Pomerode, 1371 - Salto do Norte - Blumenau/SC", 20, 32);
+      doc.line(20, 34, 190, 34);
+
+      doc.setFontSize(12);
+      doc.setFont("Helvetica", "normal");
+      doc.text(`Nº Orçamento: ${dadosOrcamento.numOrcamento}`, 20, 45);
+      doc.text(`Cliente: ${dadosOrcamento.nome}`, 20, 53);
+      doc.text(`E-mail: ${dadosOrcamento.email}`, 20, 61);
+      doc.text(`Material: ${dadosOrcamento.material}`, 20, 69);
+      doc.text(`Acabamento: ${dadosOrcamento.acabamento}`, 20, 77);
+      doc.text(`Tamanho: ${dadosOrcamento.largura.toFixed(1)} x ${dadosOrcamento.altura.toFixed(1)} cm`, 20, 85);
+      doc.text(`Quantidade: ${dadosOrcamento.quantidade}`, 20, 93);
+      doc.text(`Área Total: ${dadosOrcamento.areaTotal.toFixed(2)} m²`, 20, 101);
+      if (!dadosOrcamento.regraEspecial) {
+        doc.text(`Preço por m²: R$ ${dadosOrcamento.precoM2.toFixed(2)}`, 20, 109);
+      } else {
+        doc.text(`* Valor fixo aplicado (R$225)`, 20, 109);
+      }
+      doc.setFont("Helvetica", "bold");
+      doc.text(`Total: R$ ${dadosOrcamento.valorTotal.toFixed(2)}`, 20, 125);
+      doc.text(`Unitário: R$ ${dadosOrcamento.valorUnitario.toFixed(2)}`, 20, 133);
+      doc.text(`Milheiro: R$ ${dadosOrcamento.valorMilheiro.toFixed(2)}`, 20, 141);
+
+      doc.save(`Orcamento_${dadosOrcamento.numOrcamento}.pdf`);
+    }
+  </script>
+</body>
+</html>
