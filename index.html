@@ -5,43 +5,10 @@
   <title>Orçamento com Arte – Diff Label</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    /* Container centralizado */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f0f0f0;
-    }
-    .wrapper {
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-top: 12px;
-      font-weight: bold;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-size: 14px;
-    }
-
+    body { font-family: Arial, sans-serif; margin: 20px; max-width: 960px; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    label { display: block; margin-top: 12px; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
     .item {
       border: 1px solid #ddd;
       padding: 15px;
@@ -49,14 +16,7 @@
       border-radius: 8px;
       background: #fafafa;
     }
-
-    .item h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      font-size: 18px;
-      color: #333;
-    }
-
+    .item h3 { margin-top: 0; margin-bottom: 10px; font-size: 18px; color: #333; }
     button {
       margin-top: 15px;
       padding: 12px 20px;
@@ -68,19 +28,7 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
-    button:hover {
-      background-color: #0f5cc8;
-    }
-    #resultado {
-      margin-top: 20px;
-      padding: 15px;
-      background: #eef;
-      border-radius: 6px;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    /* Botão de WhatsApp */
+    button:hover { background-color: #0f5cc8; }
     a#btnWhats {
       display: none;
       margin-top: 15px;
@@ -93,39 +41,37 @@
       font-weight: bold;
       font-size: 16px;
     }
-    a#btnWhats:hover {
-      background-color: #1ebe5c;
+    a#btnWhats:hover { background-color: #1ebe5c; }
+    #resultado {
+      margin-top: 20px;
+      padding: 15px;
+      background: #eef;
+      border-radius: 6px;
+      font-size: 14px;
+      line-height: 1.5;
     }
-
-    /* Ajuste de espaços para textarea */
-    textarea.obs {
-      resize: vertical;
-      min-height: 40px;
-    }
+    textarea.obs { resize: vertical; min-height: 40px; }
   </style>
 </head>
 <body>
-  <div class="wrapper">
-    <h1>Orçamento com Arte – Diff Label</h1>
+  <h1>Orçamento com Arte – Diff Label</h1>
 
-    <label>Nº do Orçamento:</label>
-    <input type="text" id="numOrcamento" readonly />
+  <label>Nº do Orçamento:</label>
+  <input type="text" id="numOrcamento" readonly />
 
-    <label>Nome do Cliente:</label>
-    <input type="text" id="nomeCliente" required />
+  <label>Nome do Cliente:</label>
+  <input type="text" id="nomeCliente" required />
 
-    <label>E-mail:</label>
-    <input type="email" id="emailCliente" required />
+  <label>E-mail:</label>
+  <input type="email" id="emailCliente" required />
 
-    <div id="itensContainer"></div>
+  <div id="itensContainer"></div>
+  <button onclick="adicionarItem()">Adicionar Item</button>
+  <button onclick="calcularOrcamento()">Calcular Orçamento + Gerar PDF</button>
+  <button onclick="gerarPDF()">Gerar PDF (sem recálculo)</button>
+  <a id="btnWhats" target="_blank">Enviar via WhatsApp</a>
 
-    <button onclick="adicionarItem()">Adicionar Item</button>
-    <button onclick="calcularOrcamento()">Calcular Orçamento + Gerar PDF</button>
-    <button onclick="gerarPDF()">Gerar PDF (sem recálculo)</button>
-    <a id="btnWhats" target="_blank">Enviar via WhatsApp</a>
-
-    <div id="resultado"></div>
-  </div>
+  <div id="resultado"></div>
 
   <script>
     let contador = 0;
@@ -150,16 +96,8 @@
       "Rolo/Bobina com Laminação Fosca",
       "Rolo/Bobina com Laminação Brilho"
     ];
-    const colas = [
-      "Cola Acrílica",
-      "Cola Borracha",
-      "Cola Removível"
-    ];
-    const cores = [
-      "1x0 (Preto)",
-      "4x0 (CMYK)",
-      "5x0 (CMYK + Branco)"
-    ];
+    const colas = ["Cola Acrílica", "Cola Borracha", "Cola Removível"];
+    const cores = ["1x0 (Preto)", "4x0 (CMYK)", "5x0 (CMYK + Branco)"];
 
     function gerarNumeroOrcamento() {
       let ultimoNumero = localStorage.getItem('ultimoOrcamento') || 0;
@@ -211,9 +149,9 @@
     }
 
     function calcularOrcamento() {
-      renderizarResultado();
-      gerarLinkWhatsApp();
-      gerarPDF();
+      renderizarResultado();       // Atualiza a exibição na página
+      gerarLinkWhatsApp();         // Exibe o link de envio
+      gerarPDF();                  // Gera o PDF
     }
 
     function renderizarResultado() {
@@ -238,21 +176,31 @@
         const qtde = parseInt(item.querySelector(".quantidade").value);
         const preco = parseFloat(item.querySelector(".preco").value);
         const obs = item.querySelector(".obs").value;
-        const area = (largura * altura) / 1000000; // mm² → m²
+        const area = (largura * altura) / 1000000; // mm → m²
         const areaTotal = area * qtde;
         const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
           ? 225
           : areaTotal * preco;
+        const valorUnitario = (valorTotal / qtde).toFixed(2);
 
         totalGeral += valorTotal;
 
         resultadoHTML += `
           <li>
-            <strong>Item ${i + 1}:</strong> ${material}, ${acabamento}, ${cola}, ${cor}, 
-            ${largura}×${altura} mm, Qtde: ${qtde}, Área: ${areaTotal.toFixed(2)} m², 
-            Valor: R$ ${valorTotal.toFixed(2)}<br>
-            <em>${obs}</em>
-          </li>`;
+            <strong>Item ${i + 1}</strong><br>
+            Material: ${material}<br>
+            Acabamento: ${acabamento}<br>
+            Tipo de Cola: ${cola}<br>
+            Cores: ${cor}<br>
+            Largura: ${largura} mm<br>
+            Altura: ${altura} mm<br>
+            Quantidade: ${qtde}<br>
+            Preço por m²: R$ ${preco.toFixed(2)}<br>
+            <strong>Valor Unitário: R$ ${valorUnitario}</strong><br>
+            <strong>Valor Total do Item: R$ ${valorTotal.toFixed(2)}</strong><br>
+            <em>Observação: ${obs}</em>
+          </li><br>
+        `;
       });
 
       resultadoHTML += `</ul><h4>Total Geral: R$ ${totalGeral.toFixed(2)}</h4>`;
@@ -280,15 +228,14 @@
         const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
           ? 225
           : areaTotal * preco;
+        const valorUnitario = (valorTotal / qtde).toFixed(2);
 
-        texto += `Item ${i+1}: ${material}, ${acabamento}, ${cola}, ${cor}, ${largura}×${altura} mm, Qtde: ${qtde}, Área: ${areaTotal.toFixed(2)} m², Valor: R$ ${valorTotal.toFixed(2)}`;
-        if (obs) {
-          texto += `%0A  Obs: ${obs}`;
-        }
-        texto += `%0A`;
+        texto += `Item ${i+1}:%0AMaterial: ${material}%0AAcabamento: ${acabamento}%0ACola: ${cola}%0ACores: ${cor}%0ALargura: ${largura} mm%0AAltura: ${altura} mm%0AQuantidade: ${qtde}%0APreço/m²: R$ ${preco.toFixed(2)}%0AValor Unitário: R$ ${valorUnitario}%0AValor Total: R$ ${valorTotal.toFixed(2)}`;
+        if (obs) texto += `%0AObs: ${obs}`;
+        texto += `%0A%0A`;
       });
 
-      // Remove espaços duplicados e codifica
+      // Codifica e monta URL
       texto = encodeURI(texto.trim());
       const url = `https://wa.me/?text=${texto}`;
       const btn = document.getElementById("btnWhats");
@@ -325,24 +272,29 @@
         const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
           ? 225
           : areaTotal * preco;
+        const valorUnitario = (valorTotal / qtde).toFixed(2);
 
-        // Se estiver perto do fim da página, cria nova página
+        // Se estiver no fim da página, adiciona nova página
         if (y > 260) {
           doc.addPage();
           y = 20;
         }
 
         doc.setFont("Helvetica", "bold");
-        doc.text(`Item ${i + 1}`, 20, y);
-        y += 6;
+        doc.text(`Item ${i + 1}`, 20, y); y += 6;
         doc.setFont("Helvetica", "normal");
-        doc.text(`Material: ${material}, Acabamento: ${acabamento}`, 20, y); y += 6;
-        doc.text(`Cola: ${cola}, Cores: ${cor}`, 20, y); y += 6;
-        doc.text(`Tamanho: ${largura} × ${altura} mm, Qtde: ${qtde}`, 20, y); y += 6;
-        doc.text(`Área total: ${areaTotal.toFixed(2)} m²`, 20, y); y += 6;
-        doc.text(`Valor: R$ ${valorTotal.toFixed(2)}`, 20, y); y += 6;
+        doc.text(`Material: ${material}`, 20, y); y += 6;
+        doc.text(`Acabamento: ${acabamento}`, 20, y); y += 6;
+        doc.text(`Tipo de Cola: ${cola}`, 20, y); y += 6;
+        doc.text(`Cores: ${cor}`, 20, y); y += 6;
+        doc.text(`Largura: ${largura} mm`, 20, y); y += 6;
+        doc.text(`Altura: ${altura} mm`, 20, y); y += 6;
+        doc.text(`Quantidade: ${qtde}`, 20, y); y += 6;
+        doc.text(`Preço por m²: R$ ${preco.toFixed(2)}`, 20, y); y += 6;
+        doc.text(`Valor Unitário: R$ ${valorUnitario}`, 20, y); y += 6;
+        doc.text(`Valor Total do Item: R$ ${valorTotal.toFixed(2)}`, 20, y); y += 6;
         if (obs) {
-          doc.text(`Obs: ${obs}`, 20, y);
+          doc.text(`Observação: ${obs}`, 20, y);
           y += 6;
         }
 
