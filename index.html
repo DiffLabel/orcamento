@@ -195,7 +195,6 @@
             Largura: ${largura} mm<br>
             Altura: ${altura} mm<br>
             Quantidade: ${qtde}<br>
-            Preço por m²: R$ ${preco.toFixed(2)}<br>
             <strong>Valor Unitário: R$ ${valorUnitario}</strong><br>
             <strong>Valor Total do Item: R$ ${valorTotal.toFixed(2)}</strong><br>
             <em>Observação: ${obs}</em>
@@ -230,7 +229,7 @@
           : areaTotal * preco;
         const valorUnitario = (valorTotal / qtde).toFixed(4);
 
-        texto += `Item ${i+1}:%0AMaterial: ${material}%0AAcabamento: ${acabamento}%0ACola: ${cola}%0ACores: ${cor}%0ALargura: ${largura} mm%0AAltura: ${altura} mm%0AQuantidade: ${qtde}%0APreço/m²: R$ ${preco.toFixed(2)}%0AValor Unitário: R$ ${valorUnitario}%0AValor Total: R$ ${valorTotal.toFixed(2)}`;
+        texto += `Item ${i+1}:%0AMaterial: ${material}%0AAcabamento: ${acabamento}%0ACola: ${cola}%0ACores: ${cor}%0ALargura: ${largura} mm%0AAltura: ${altura} mm%0AQuantidade: ${qtde}%0AValor Unitário: R$ ${valorUnitario}%0AValor Total: R$ ${valorTotal.toFixed(2)}`;
         if (obs) texto += `%0AObs: ${obs}`;
         texto += `%0A%0A`;
       });
@@ -288,7 +287,7 @@
         doc.text(`Largura: ${largura} mm`, 20, y); y += 6;
         doc.text(`Altura: ${altura} mm`, 20, y); y += 6;
         doc.text(`Quantidade: ${qtde}`, 20, y); y += 6;
-        doc.text(`Preço por m²: R$ ${preco.toFixed(2)}`, 20, y); y += 6;
+        // Não inclui "Preço por m²" no PDF
         doc.text(`Valor Unitário: R$ ${valorUnitario}`, 20, y); y += 6;
         doc.text(`Valor Total do Item: R$ ${valorTotal.toFixed(2)}`, 20, y); y += 6;
         if (obs) {
@@ -298,7 +297,6 @@
 
         const imgData = imagens[i];
         if (imgData) {
-          // Insere imagem no canto direito, tamanho 50×30 mm
           doc.addImage(imgData, "JPEG", 140, y - 36, 50, 30);
         }
         y += 10;
