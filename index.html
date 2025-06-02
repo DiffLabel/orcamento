@@ -1,231 +1,245 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Orçamento - Diff Label</title>
+  <meta charset="UTF-8" />
+  <title>Orçamento com Arte – Diff Label</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #f9f9f9;
-      border-radius: 8px;
-    }
-    h1, h3 { text-align: center; }
-    label { display: block; margin-top: 12px; font-weight: bold; }
-    input, select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-    }
-    button {
-      margin-top: 15px;
-      padding: 10px;
-      width: 100%;
-      background-color: #1a73e8;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button:hover { background-color: #0f5cc8; }
-    #resultado {
-      background-color: #fff;
+    body { font-family: Arial, sans-serif; margin: 20px; max-width: 960px; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    .item {
+      border: 1px solid #ccc;
       padding: 15px;
-      margin-top: 20px;
-      border-radius: 6px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+      border-radius: 8px;
+      background: #f9f9f9;
     }
-    a#btnWhats {
-      display: none;
-      text-align: center;
-      text-decoration: none;
-      background-color: #25D366;
-      color: white;
-      padding: 12px;
-      border-radius: 4px;
-      font-weight: bold;
-      margin-top: 10px;
-      display: block;
+    label { display: block; margin-top: 8px; }
+    input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; }
+    button { margin-top: 15px; padding: 10px 20px; cursor: pointer; }
+    #resultado {
+      margin-top: 20px;
+      padding: 15px;
+      background: #eef;
+      border-radius: 6px;
     }
   </style>
 </head>
 <body>
-  <h1>Orçamento - Diff Label</h1>
-  <form id="form-orcamento">
-    <label>Nº do Orçamento:</label>
-    <input type="text" id="numOrcamento" readonly>
+  <h1>Orçamento com Arte – Diff Label</h1>
 
-    <label>Nome do Cliente:</label>
-    <input type="text" id="nomeCliente" required>
+  <label>Nº do Orçamento:</label>
+  <input type="text" id="numOrcamento" readonly />
 
-    <label>E-mail:</label>
-    <input type="email" id="emailCliente" required>
+  <label>Nome do Cliente:</label>
+  <input type="text" id="nomeCliente" required />
 
-    <label>Largura (mm):</label>
-    <input type="number" id="largura" required>
+  <label>E-mail:</label>
+  <input type="email" id="emailCliente" required />
 
-    <label>Altura (mm):</label>
-    <input type="number" id="altura" required>
+  <div id="itensContainer"></div>
 
-    <label>Quantidade:</label>
-    <input type="number" id="quantidade" required>
-
-    <label>Preço por m² (R$):</label>
-    <input type="number" id="precoM2" required step="0.01">
-
-    <label>Material:</label>
-    <select id="material">
-      <option>Ad couche</option>
-      <option>Bopp branco fosco</option>
-      <option>Bopp brilho</option>
-      <option>Bopp metalizado</option>
-      <option>Bopp transparente</option>
-      <option>Bopp holografico</option>
-      <option>Vinil fosco</option>
-      <option>Vinil amarelo</option>
-      <option>Vinil preto</option>
-      <option>Vinil brilho</option>
-      <option>Vinil refletivo</option>
-      <option>Vinil transparente</option>
-    </select>
-
-    <label>Acabamento:</label>
-    <select id="acabamento">
-      <option>Cartela</option>
-      <option>Rolo/bobina</option>
-      <option>Rolo/bobina com laminação fosca</option>
-      <option>Rolo/bobina com laminação brilho</option>
-    </select>
-
-    <label>Tipo de Cola:</label>
-    <select id="cola">
-      <option>Cola acrilica</option>
-      <option>Cola borracha</option>
-      <option>Cola removivel</option>
-    </select>
-
-    <label>Cores:</label>
-    <select id="cores">
-      <option>1x0 (preto)</option>
-      <option>4x0 (CMYK)</option>
-      <option>5x0 (CMYK + Branco)</option>
-       <option>5x0 (CMYK + Verniz Localzado)</option>
-    </select>
-
-    <button type="button" onclick="calcularOrcamento()">Calcular Orçamento</button>
-  </form>
+  <button onclick="adicionarItem()">Adicionar Item</button>
+  <button onclick="calcularOrcamento()">Calcular Orçamento + Gerar PDF</button>
+  <button onclick="gerarPDF()">Gerar PDF (sem recálculo)</button>
 
   <div id="resultado"></div>
-  <a id="btnWhats" target="_blank">Enviar pelo WhatsApp</a>
 
   <script>
-    let dadosOrcamento = {};
+    let contador = 0;
+    const imagens = [];
+    const materiais = [
+      "Ad Couche",
+      "Bopp Branco Fosco",
+      "Bopp Brilho",
+      "Bopp Metalizado",
+      "Bopp Transparente",
+      "Bopp Holográfico",
+      "Vinil Fosco",
+      "Vinil Amarelo",
+      "Vinil Preto",
+      "Vinil Brilho",
+      "Vinil Refletivo",
+      "Vinil Transparente"
+    ];
+    const acabamentos = [
+      "Em Cartela",
+      "Em Rolo/Bobina",
+      "Rolo/Bobina com Laminação Fosca",
+      "Rolo/Bobina com Laminação Brilho"
+    ];
+    const colas = [
+      "Cola Acrílica",
+      "Cola Borracha",
+      "Cola Removível"
+    ];
+    const cores = [
+      "1x0 (Preto)",
+      "4x0 (CMYK)",
+      "5x0 (CMYK + Branco)"
+    ];
 
     function gerarNumeroOrcamento() {
-      let ultimoNumero = localStorage.getItem('ultimoOrcamento');
-      if (!ultimoNumero) ultimoNumero = 1;
-      else ultimoNumero = parseInt(ultimoNumero) + 1;
+      let ultimoNumero = localStorage.getItem('ultimoOrcamento') || 0;
+      ultimoNumero = parseInt(ultimoNumero) + 1;
       localStorage.setItem('ultimoOrcamento', ultimoNumero);
       document.getElementById('numOrcamento').value = String(ultimoNumero).padStart(4, '0');
     }
-    window.onload = gerarNumeroOrcamento;
 
-    function calcularOrcamento() {
-      const numOrcamento = document.getElementById('numOrcamento').value;
-      const nome = document.getElementById('nomeCliente').value;
-      const email = document.getElementById('emailCliente').value;
-      const largura = parseFloat(document.getElementById('largura').value) + 3;
-      const altura = parseFloat(document.getElementById('altura').value) + 3;
-      const quantidade = parseInt(document.getElementById('quantidade').value);
-      const precoM2 = parseFloat(document.getElementById('precoM2').value);
-      const material = document.getElementById('material').value;
-      const acabamento = document.getElementById('acabamento').value;
-      const cola = document.getElementById('cola').value;
-      const cores = document.getElementById('cores').value;
-
-      const areaMM = largura * altura;
-      const areaM2 = areaMM / 1000000;
-      const areaTotal = areaM2 * quantidade;
-
-      let valorTotal;
-      let regraEspecial = false;
-
-      if (material.includes("vinil") && areaTotal < 5 && quantidade <= 2000) {
-        valorTotal = 225;
-        regraEspecial = true;
-      } else {
-        valorTotal = areaTotal * precoM2;
-      }
-
-      const valorUnitario = valorTotal / quantidade;
-      const valorMilheiro = valorUnitario * 1000;
-
-      dadosOrcamento = {
-        numOrcamento, nome, email, largura, altura, quantidade, precoM2,
-        material, acabamento, cola, cores, areaTotal, valorTotal, valorUnitario, valorMilheiro, regraEspecial
-      };
-
-      document.getElementById('resultado').innerHTML = `
-        <h3>Resumo do Orçamento</h3>
-        <p><strong>Nº Orçamento:</strong> ${numOrcamento}</p>
-        <p><strong>Cliente:</strong> ${nome}</p>
-        <p><strong>Material:</strong> ${material}</p>
-        <p><strong>Acabamento:</strong> ${acabamento}</p>
-        <p><strong>Tipo de Cola:</strong> ${cola}</p>
-        <p><strong>Cores:</strong> ${cores}</p>
-        <p><strong>Área Total:</strong> ${areaTotal.toFixed(2)} m²</p>
-        <p><strong>Valor Total:</strong> R$ ${valorTotal.toFixed(2)} ${regraEspecial ? '(Valor fixo)' : ''}</p>
-        <p><strong>Unitário:</strong> R$ ${valorUnitario.toFixed(2)}</p>
-        <p><strong>Milheiro:</strong> R$ ${valorMilheiro.toFixed(2)}</p>
-      `;
-
-      gerarPDF();
-      gerarLinkWhatsApp();
+    function criarSelect(options) {
+      return options.map(o => `<option>${o}</option>`).join("");
     }
 
-    function gerarLinkWhatsApp() {
-      const texto = `Orçamento #${dadosOrcamento.numOrcamento}%0ACliente: ${dadosOrcamento.nome}%0AMaterial: ${dadosOrcamento.material}%0AAcabamento: ${dadosOrcamento.acabamento}%0ACola: ${dadosOrcamento.cola}%0ACores: ${dadosOrcamento.cores}%0AÁrea: ${dadosOrcamento.areaTotal.toFixed(2)} m²%0AQuantidade: ${dadosOrcamento.quantidade}%0ATotal: R$ ${dadosOrcamento.valorTotal.toFixed(2)}`;
-      const url = `https://wa.me/?text=${texto}`;
-      const btn = document.getElementById("btnWhats");
-      btn.href = url;
-      btn.style.display = "block";
+    function adicionarItem() {
+      const container = document.getElementById("itensContainer");
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <h3>Item ${contador + 1}</h3>
+        <label>Material:</label>
+        <select class="material">${criarSelect(materiais)}</select>
+        <label>Acabamento:</label>
+        <select class="acabamento">${criarSelect(acabamentos)}</select>
+        <label>Tipo de Cola:</label>
+        <select class="cola">${criarSelect(colas)}</select>
+        <label>Cores:</label>
+        <select class="cores">${criarSelect(cores)}</select>
+        <label>Largura (mm):</label>
+        <input type="number" class="largura" required />
+        <label>Altura (mm):</label>
+        <input type="number" class="altura" required />
+        <label>Quantidade:</label>
+        <input type="number" class="quantidade" required />
+        <label>Preço por m² (R$):</label>
+        <input type="number" class="preco" step="0.01" required />
+        <label>Observação:</label>
+        <textarea class="obs" rows="2"></textarea>
+        <label>Arte (imagem):</label>
+        <input type="file" class="arte" accept="image/*" onchange="carregarImagem(this, ${contador})" />
+      `;
+      container.appendChild(div);
+      imagens.push(null);
+      contador++;
+    }
+
+    function carregarImagem(input, index) {
+      const reader = new FileReader();
+      reader.onload = () => imagens[index] = reader.result;
+      if (input.files[0]) reader.readAsDataURL(input.files[0]);
+    }
+
+    function calcularOrcamento() {
+      // Exibe o resumo no HTML antes de gerar o PDF
+      renderizarResultado();
+      gerarPDF();
+    }
+
+    function renderizarResultado() {
+      const nome = document.getElementById("nomeCliente").value;
+      const email = document.getElementById("emailCliente").value;
+      const numOrcamento = document.getElementById("numOrcamento").value;
+      const itens = document.querySelectorAll(".item");
+      let totalGeral = 0;
+      let resultadoHTML = `
+        <h3>Orçamento #${numOrcamento}</h3>
+        <p>Cliente: ${nome}<br>Email: ${email}</p>
+        <ul>
+      `;
+
+      itens.forEach((item, i) => {
+        const material = item.querySelector(".material").value;
+        const acabamento = item.querySelector(".acabamento").value;
+        const cola = item.querySelector(".cola").value;
+        const cor = item.querySelector(".cores").value;
+        const largura = parseFloat(item.querySelector(".largura").value) + 3;
+        const altura = parseFloat(item.querySelector(".altura").value) + 3;
+        const qtde = parseInt(item.querySelector(".quantidade").value);
+        const preco = parseFloat(item.querySelector(".preco").value);
+        const obs = item.querySelector(".obs").value;
+        const area = (largura * altura) / 1000000; // mm² → m²
+        const areaTotal = area * qtde;
+        const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
+          ? 225
+          : areaTotal * preco;
+
+        totalGeral += valorTotal;
+
+        resultadoHTML += `
+          <li>
+            <strong>Item ${i + 1}:</strong> ${material}, ${acabamento}, ${cola}, ${cor}, 
+            ${largura}×${altura} mm, Qtde: ${qtde}, Área: ${areaTotal.toFixed(2)} m², 
+            Valor: R$ ${valorTotal.toFixed(2)}
+            <br><em>${obs}</em>
+          </li>`;
+      });
+
+      resultadoHTML += `</ul><h4>Total Geral: R$ ${totalGeral.toFixed(2)}</h4>`;
+      document.getElementById("resultado").innerHTML = resultadoHTML;
     }
 
     async function gerarPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
+      const nome = document.getElementById("nomeCliente").value;
+      const email = document.getElementById("emailCliente").value;
+      const numOrcamento = document.getElementById("numOrcamento").value;
 
-      doc.setFont("Helvetica", "bold");
       doc.setFontSize(14);
-      doc.text("Diff Comércio de Papeis e Embalagens LTDA", 20, 20);
-      doc.setFontSize(10);
-      doc.text("CNPJ: 18.678.030/0001-17", 20, 26);
-      doc.text("Rua Pomerode, 1371 - Salto do Norte - Blumenau/SC", 20, 32);
-      doc.line(20, 34, 190, 34);
+      doc.text(`Orçamento Nº ${numOrcamento}`, 20, 20);
+      doc.setFontSize(11);
+      doc.text(`Cliente: ${nome}`, 20, 28);
+      doc.text(`Email: ${email}`, 20, 34);
+      let y = 44;
 
-      doc.setFontSize(12);
-      doc.setFont("Helvetica", "normal");
-      doc.text(`Nº Orçamento: ${dadosOrcamento.numOrcamento}`, 20, 45);
-      doc.text(`Cliente: ${dadosOrcamento.nome}`, 20, 53);
-      doc.text(`Email: ${dadosOrcamento.email}`, 20, 61);
-      doc.text(`Material: ${dadosOrcamento.material}`, 20, 69);
-      doc.text(`Acabamento: ${dadosOrcamento.acabamento}`, 20, 77);
-      doc.text(`Cola: ${dadosOrcamento.cola}`, 20, 85);
-      doc.text(`Cores: ${dadosOrcamento.cores}`, 20, 93);
-      doc.text(`Tamanho: ${dadosOrcamento.largura} x ${dadosOrcamento.altura} mm`, 20, 101);
-      doc.text(`Quantidade: ${dadosOrcamento.quantidade}`, 20, 109);
-      doc.text(`Área Total: ${dadosOrcamento.areaTotal.toFixed(2)} m²`, 20, 117);
-      doc.setFont("Helvetica", "bold");
-      doc.text(`Total: R$ ${dadosOrcamento.valorTotal.toFixed(2)}`, 20, 133);
-      doc.text(`Unitário: R$ ${dadosOrcamento.valorUnitario.toFixed(2)}`, 20, 141);
-      doc.text(`Milheiro: R$ ${dadosOrcamento.valorMilheiro.toFixed(2)}`, 20, 149);
+      document.querySelectorAll(".item").forEach((item, i) => {
+        const material = item.querySelector(".material").value;
+        const acabamento = item.querySelector(".acabamento").value;
+        const cola = item.querySelector(".cola").value;
+        const cor = item.querySelector(".cores").value;
+        const largura = parseFloat(item.querySelector(".largura").value) + 3;
+        const altura = parseFloat(item.querySelector(".altura").value) + 3;
+        const qtde = parseInt(item.querySelector(".quantidade").value);
+        const preco = parseFloat(item.querySelector(".preco").value);
+        const obs = item.querySelector(".obs").value;
+        const area = (largura * altura) / 1000000;
+        const areaTotal = area * qtde;
+        const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
+          ? 225
+          : areaTotal * preco;
 
-      doc.save(`Orcamento_${dadosOrcamento.numOrcamento}.pdf`);
+        // Se perto do fim da página, cria nova página
+        if (y > 260) {
+          doc.addPage();
+          y = 20;
+        }
+
+        doc.setFont("Helvetica", "bold");
+        doc.text(`Item ${i + 1}`, 20, y); y += 6;
+        doc.setFont("Helvetica", "normal");
+        doc.text(`Material: ${material}, Acabamento: ${acabamento}`, 20, y); y += 6;
+        doc.text(`Cola: ${cola}, Cores: ${cor}`, 20, y); y += 6;
+        doc.text(`Tamanho: ${largura} × ${altura} mm, Qtde: ${qtde}`, 20, y); y += 6;
+        doc.text(`Área total: ${areaTotal.toFixed(2)} m²`, 20, y); y += 6;
+        doc.text(`Valor: R$ ${valorTotal.toFixed(2)}`, 20, y); y += 6;
+        if (obs) {
+          doc.text(`Obs: ${obs}`, 20, y);
+          y += 6;
+        }
+
+        const imgData = imagens[i];
+        if (imgData) {
+          doc.addImage(imgData, "JPEG", 140, y - 36, 50, 30);
+        }
+        y += 10;
+      });
+
+      doc.save(`Orcamento_${numOrcamento}.pdf`);
     }
+
+    window.onload = () => {
+      gerarNumeroOrcamento();
+      adicionarItem(); // já cria o primeiro item
+    };
   </script>
 </body>
 </html>
