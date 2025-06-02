@@ -181,7 +181,7 @@
         const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
           ? 225
           : areaTotal * preco;
-        const valorUnitario = (valorTotal / qtde).toFixed(2);
+        const valorUnitario = (valorTotal / qtde).toFixed(4);
 
         totalGeral += valorTotal;
 
@@ -228,14 +228,13 @@
         const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
           ? 225
           : areaTotal * preco;
-        const valorUnitario = (valorTotal / qtde).toFixed(2);
+        const valorUnitario = (valorTotal / qtde).toFixed(4);
 
         texto += `Item ${i+1}:%0AMaterial: ${material}%0AAcabamento: ${acabamento}%0ACola: ${cola}%0ACores: ${cor}%0ALargura: ${largura} mm%0AAltura: ${altura} mm%0AQuantidade: ${qtde}%0APreço/m²: R$ ${preco.toFixed(2)}%0AValor Unitário: R$ ${valorUnitario}%0AValor Total: R$ ${valorTotal.toFixed(2)}`;
         if (obs) texto += `%0AObs: ${obs}`;
         texto += `%0A%0A`;
       });
 
-      // Codifica e monta URL
       texto = encodeURI(texto.trim());
       const url = `https://wa.me/?text=${texto}`;
       const btn = document.getElementById("btnWhats");
@@ -272,9 +271,8 @@
         const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
           ? 225
           : areaTotal * preco;
-        const valorUnitario = (valorTotal / qtde).toFixed(2);
+        const valorUnitario = (valorTotal / qtde).toFixed(4);
 
-        // Se estiver no fim da página, adiciona nova página
         if (y > 260) {
           doc.addPage();
           y = 20;
