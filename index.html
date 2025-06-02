@@ -5,10 +5,30 @@
   <title>Orçamento com Arte – Diff Label</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; max-width: 960px; }
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      max-width: 960px; 
+      background: #f5f5f5;
+    }
+    .wrapper {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
     h1 { text-align: center; margin-bottom: 20px; }
     label { display: block; margin-top: 12px; font-weight: bold; }
-    input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+    input, select, textarea { 
+      width: 100%; 
+      padding: 8px; 
+      margin-top: 4px; 
+      border: 1px solid #ccc; 
+      border-radius: 4px; 
+      font-size: 14px; 
+      box-sizing: border-box;
+    }
+    textarea { resize: vertical; min-height: 60px; }
     .item {
       border: 1px solid #ddd;
       padding: 15px;
@@ -50,28 +70,81 @@
       font-size: 14px;
       line-height: 1.5;
     }
-    textarea.obs { resize: vertical; min-height: 40px; }
+    .section-divider {
+      border-top: 1px solid #ccc;
+      margin: 20px 0;
+    }
   </style>
 </head>
 <body>
-  <h1>Orçamento com Arte – Diff Label</h1>
+  <div class="wrapper">
+    <h1>Orçamento com Arte – Diff Label</h1>
 
-  <label>Nº do Orçamento:</label>
-  <input type="text" id="numOrcamento" readonly />
+    <label>Nº do Orçamento:</label>
+    <input type="text" id="numOrcamento" readonly />
 
-  <label>Nome do Cliente:</label>
-  <input type="text" id="nomeCliente" required />
+    <label>Nome do Cliente:</label>
+    <input type="text" id="nomeCliente" required />
 
-  <label>E-mail:</label>
-  <input type="email" id="emailCliente" required />
+    <label>E-mail:</label>
+    <input type="email" id="emailCliente" required />
 
-  <div id="itensContainer"></div>
-  <button onclick="adicionarItem()">Adicionar Item</button>
-  <button onclick="calcularOrcamento()">Calcular Orçamento + Gerar PDF</button>
-  <button onclick="gerarPDF()">Gerar PDF (sem recálculo)</button>
-  <a id="btnWhats" target="_blank">Enviar via WhatsApp</a>
+    <div id="itensContainer"></div>
+    <button onclick="adicionarItem()">Adicionar Item</button>
 
-  <div id="resultado"></div>
+    <!-- Termos e Condições editáveis -->
+    <div class="section-divider"></div>
+    <h2>Termos e Condições de Venda</h2>
+    <label>Validade da Proposta (fixo “10 dias”):</label>
+    <input type="text" id="validadeProposta" value="10 dias" />
+
+    <label>Prazo de Entrega (dias úteis):</label>
+    <select id="prazoEntrega">
+      <option>3/4</option>
+      <option>5/6</option>
+      <option>7/8</option>
+      <option>9/10</option>
+    </select>
+
+    <label>Condição de Pagamento:</label>
+    <select id="condPagamento">
+      <option>À vista</option>
+      <option>14dd</option>
+      <option>21dd</option>
+      <option>28dd</option>
+      <option>14/28dd</option>
+      <option>35dd</option>
+    </select>
+
+    <label>Frete:</label>
+    <select id="frete">
+      <option>FOB</option>
+      <option>CIF</option>
+    </select>
+
+    <label>Contato Comercial:</label>
+    <input type="text" id="contatoComercial" value="pedro@diffembalagens.com.br" />
+
+    <!-- Observações gerais -->
+    <div class="section-divider"></div>
+    <h2>OBS:</h2>
+    <textarea id="obsGerais">
+Para agilizar a impressão, pedimos que arquivos sejam enviados em pdf vetorizado;
+Para impressão em Bopp Metalizado/Transparente o arquivo recebido pela Diff deve conter o mapa de branco, caso contrário será adicionado 1 dia a mais no prazo de entrega;
+A Diff só se responsabiliza por cores exatas de trabalho, quando a mesma receber amostra física ou prova de cor do cliente;
+A impressão só será feita após aprovação por e-mail do arquivo: "layout de aprovação";
+Prazo de Entrega começa a contar após aprovação do "Layout de aprovação";
+Haverá atualização de valor, caso formato/quantidade final do rótulo seja diferente do proposto inicialmente.
+    </textarea>
+
+    <div class="section-divider"></div>
+
+    <button onclick="calcularOrcamento()">Calcular Orçamento + Gerar PDF</button>
+    <button onclick="gerarPDF()">Gerar PDF (sem recálculo)</button>
+    <a id="btnWhats" target="_blank">Enviar via WhatsApp</a>
+
+    <div id="resultado"></div>
+  </div>
 
   <script>
     let contador = 0;
@@ -202,7 +275,29 @@
         `;
       });
 
+      // Termos e Condições e OBS gerais
+      const validade = document.getElementById("validadeProposta").value;
+      const prazoEntrega = document.getElementById("prazoEntrega").value;
+      const condPagamento = document.getElementById("condPagamento").value;
+      const frete = document.getElementById("frete").value;
+      const contato = document.getElementById("contatoComercial").value;
+      const obsGerais = document.getElementById("obsGerais").value.replace(/\n/g, "<br>");
+
       resultadoHTML += `</ul><h4>Total Geral: R$ ${totalGeral.toFixed(2)}</h4>`;
+      resultadoHTML += `
+        <div class="section-divider"></div>
+        <h2>Termos e Condições de Venda</h2>
+        <p>Validade da Proposta: ${validade}</p>
+        <p>Prazo de Entrega (dias úteis): ${prazoEntrega}</p>
+        <p>Condição de Pagamento: ${condPagamento}</p>
+        <p>Frete: ${frete}</p>
+        <p>Contato Comercial: ${contato}</p>
+        <div class="section-divider"></div>
+        <h2>OBS:</h2>
+        <p>${obsGerais}</p>
+        <div class="section-divider"></div>
+      `;
+
       document.getElementById("resultado").innerHTML = resultadoHTML;
     }
 
@@ -234,6 +329,16 @@
         texto += `%0A%0A`;
       });
 
+      // Termos e Condições e OBS gerais no WhatsApp
+      const validade = document.getElementById("validadeProposta").value;
+      const prazoEntrega = document.getElementById("prazoEntrega").value;
+      const condPagamento = document.getElementById("condPagamento").value;
+      const frete = document.getElementById("frete").value;
+      const contato = document.getElementById("contatoComercial").value;
+      const obsGerais = document.getElementById("obsGerais").value.split("\n").join("%0A");
+
+      texto += `Termos e Condições de Venda:%0AValidade da Proposta: ${validade}%0APrazo de Entrega: ${prazoEntrega}%0ACondição de Pagamento: ${condPagamento}%0AFrete: ${frete}%0AContato Comercial: ${contato}%0A%0AOBS:%0A${encodeURI(obsGerais)}%0A`;
+
       texto = encodeURI(texto.trim());
       const url = `https://wa.me/?text=${texto}`;
       const btn = document.getElementById("btnWhats");
@@ -248,13 +353,15 @@
       const email = document.getElementById("emailCliente").value;
       const numOrcamento = document.getElementById("numOrcamento").value;
 
+      // Cabeçalho
       doc.setFontSize(14);
       doc.text(`Orçamento Nº ${numOrcamento}`, 20, 20);
       doc.setFontSize(11);
       doc.text(`Cliente: ${nome}`, 20, 28);
       doc.text(`Email: ${email}`, 20, 34);
-      let y = 44;
 
+      let y = 44;
+      // Itens
       document.querySelectorAll(".item").forEach((item, i) => {
         const material = item.querySelector(".material").value;
         const acabamento = item.querySelector(".acabamento").value;
@@ -272,7 +379,8 @@
           : areaTotal * preco;
         const valorUnitario = (valorTotal / qtde).toFixed(4);
 
-        if (y > 260) {
+        // Nova página se ultrapassar
+        if (y > 250) {
           doc.addPage();
           y = 20;
         }
@@ -287,7 +395,6 @@
         doc.text(`Largura: ${largura} mm`, 20, y); y += 6;
         doc.text(`Altura: ${altura} mm`, 20, y); y += 6;
         doc.text(`Quantidade: ${qtde}`, 20, y); y += 6;
-        // Não inclui "Preço por m²" no PDF
         doc.text(`Valor Unitário: R$ ${valorUnitario}`, 20, y); y += 6;
         doc.text(`Valor Total do Item: R$ ${valorTotal.toFixed(2)}`, 20, y); y += 6;
         if (obs) {
@@ -301,6 +408,64 @@
         }
         y += 10;
       });
+
+      // Linha divisória antes dos termos
+      if (y > 250) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.5);
+      doc.line(20, y, 190, y);
+      y += 8;
+
+      // Termos e Condições
+      const validade = document.getElementById("validadeProposta").value;
+      const prazoEntrega = document.getElementById("prazoEntrega").value;
+      const condPagamento = document.getElementById("condPagamento").value;
+      const frete = document.getElementById("frete").value;
+      const contato = document.getElementById("contatoComercial").value;
+      const obsGerais = document.getElementById("obsGerais").value.split("\n");
+
+      doc.setFontSize(12);
+      doc.setFont("Helvetica", "bold");
+      doc.text("TERMOS E CONDIÇÕES DE VENDA:", 20, y); y += 6;
+      doc.setFont("Helvetica", "normal");
+      doc.text(`Validade da Proposta: ${validade}`, 20, y); y += 6;
+      doc.text(`Prazo de Entrega (dias úteis): ${prazoEntrega}`, 20, y); y += 6;
+      doc.text(`Condição de Pagamento: ${condPagamento}`, 20, y); y += 6;
+      doc.text(`Frete: ${frete}`, 20, y); y += 6;
+      doc.text(`Contato Comercial: ${contato}`, 20, y); y += 10;
+
+      // Linha divisória antes de OBS
+      if (y > 250) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setLineWidth(0.5);
+      doc.line(20, y, 190, y);
+      y += 8;
+
+      // OBS gerais
+      doc.setFont("Helvetica", "bold");
+      doc.text("OBS:", 20, y); y += 6;
+      doc.setFont("Helvetica", "normal");
+      obsGerais.forEach(line => {
+        if (y > 260) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(`• ${line}`, 20, y);
+        y += 6;
+      });
+
+      // Linha final
+      if (y > 250) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setLineWidth(0.5);
+      doc.line(20, y, 190, y);
 
       doc.save(`Orcamento_${numOrcamento}.pdf`);
     }
