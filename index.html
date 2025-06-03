@@ -5,10 +5,10 @@
   <title>Proposta Comercial – Diff Label</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      margin: 20px; 
-      max-width: 960px; 
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      max-width: 960px;
       background: #f5f5f5;
     }
     .wrapper {
@@ -17,15 +17,22 @@
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
-    h1 { text-align: center; margin-bottom: 20px; }
-    label { display: block; margin-top: 12px; font-weight: bold; }
-    input, select, textarea { 
-      width: 100%; 
-      padding: 8px; 
-      margin-top: 4px; 
-      border: 1px solid #ccc; 
-      border-radius: 4px; 
-      font-size: 14px; 
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
       box-sizing: border-box;
     }
     /* Estilo chamativo e cor vermelha para a textarea de OBS gerais */
@@ -36,7 +43,10 @@
       border-color: #e74c3c;
       background-color: #fdecea;
     }
-    textarea { resize: vertical; min-height: 60px; }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
     .item {
       border: 1px solid #ddd;
       padding: 15px;
@@ -44,7 +54,12 @@
       border-radius: 8px;
       background: #fafafa;
     }
-    .item h3 { margin-top: 0; margin-bottom: 10px; font-size: 18px; color: #333; }
+    .item h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #333;
+    }
     button {
       margin-top: 15px;
       padding: 12px 20px;
@@ -56,7 +71,9 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
-    button:hover { background-color: #0f5cc8; }
+    button:hover {
+      background-color: #0f5cc8;
+    }
     a#btnWhats {
       display: none;
       margin-top: 15px;
@@ -69,7 +86,9 @@
       font-weight: bold;
       font-size: 16px;
     }
-    a#btnWhats:hover { background-color: #1ebe5c; }
+    a#btnWhats:hover {
+      background-color: #1ebe5c;
+    }
     #resultado {
       margin-top: 20px;
       padding: 15px;
@@ -183,8 +202,16 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       "Rolo/Bobina com Laminação Fosca",
       "Rolo/Bobina com Laminação Brilho"
     ];
-    const colas = ["Cola Acrílica", "Cola Borracha", "Cola Removível"];
-    const cores = ["1x0 (Preto)", "4x0 (CMYK)", "5x0 (CMYK + Branco)"];
+    const colas = [
+      "Cola Acrílica",
+      "Cola Borracha",
+      "Cola Removível"
+    ];
+    const cores = [
+      "1x0 (Preto)",
+      "4x0 (CMYK)",
+      "5x0 (CMYK + Branco)"
+    ];
 
     function gerarNumeroOrcamento() {
       let ultimoNumero = localStorage.getItem('ultimoOrcamento') || 0;
@@ -244,27 +271,28 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
     }
 
     function renderizarResultado() {
-      const nome = document.getElementById("nomeCliente").value;
-      const cnpj = document.getElementById("cnpjCliente").value;
-      const tel = document.getElementById("telefoneCliente").value;
-      const email = document.getElementById("emailCliente").value;
+      const nome = document.getElementById("nomeCliente").value || "-";
+      const cnpj = document.getElementById("cnpjCliente").value || "-";
+      const tel = document.getElementById("telefoneCliente").value || "-";
+      const email = document.getElementById("emailCliente").value || "-";
       const numOrcamento = document.getElementById("numOrcamento").value;
       const data = new Date().toLocaleDateString('pt-BR');
       const itens = document.querySelectorAll(".item");
       let totalGeral = 0;
+
       let resultadoHTML = `
         <h3>Proposta Comercial ${numOrcamento}</h3>
         <p><strong>Data:</strong> ${data}</p>
         <p><strong>Cliente:</strong> ${nome} | <strong>CNPJ:</strong> ${cnpj} | <strong>Telefone:</strong> ${tel} | <strong>E-mail:</strong> ${email}</p>
-        <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+        <div style="overflow-x:auto; margin-top: 10px;">
+        <table style="width:100%; border-collapse: collapse;">
           <thead style="background-color: #dddddd;">
             <tr>
               <th style="border: 1px solid #bbb; padding: 6px;">Itens</th>
               <th style="border: 1px solid #bbb; padding: 6px;">Descrição dos Produtos</th>
               <th style="border: 1px solid #bbb; padding: 6px;">Qtd.</th>
               <th style="border: 1px solid #bbb; padding: 6px;">Un.</th>
-              <th style="border: 1px solid #bbb; padding: 6px;">Preço com Impostos (R$)</th>
+              <th style="border: 1px solid #bbb; padding: 6px;">Preço c/ Impostos (R$)</th>
               <th style="border: 1px solid #bbb; padding: 6px;">Total (R$)</th>
             </tr>
           </thead>
@@ -276,10 +304,14 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         const acabamento = item.querySelector(".acabamento").value;
         const cola = item.querySelector(".cola").value;
         const cor = item.querySelector(".cores").value;
-        const largura = parseFloat(item.querySelector(".largura").value) + 3;
-        const altura = parseFloat(item.querySelector(".altura").value) + 3;
-        const qtde = parseInt(item.querySelector(".quantidade").value);
-        const preco = parseFloat(item.querySelector(".preco").value);
+        const larguraInput = parseFloat(item.querySelector(".largura").value);
+        const alturaInput = parseFloat(item.querySelector(".altura").value);
+        const largura = isNaN(larguraInput) ? 0 : larguraInput + 3;
+        const altura = isNaN(alturaInput) ? 0 : alturaInput + 3;
+        const qtdeInput = parseInt(item.querySelector(".quantidade").value);
+        const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
+        const precoInput = parseFloat(item.querySelector(".preco").value);
+        const preco = isNaN(precoInput) ? 0 : precoInput;
         const sku = item.querySelector(".sku").value || "-";
         const obs = item.querySelector(".obs").value;
         const area = (largura * altura) / 1000000; // mm → m²
@@ -287,16 +319,17 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
           ? 225
           : areaTotal * preco;
-        const valorUnitario = (valorTotal / qtde).toFixed(4);
+        const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : "0.0000";
+
         totalGeral += valorTotal;
 
         resultadoHTML += `
           <tr>
             <td style="border: 1px solid #bbb; padding: 6px; text-align: center;">${i+1}</td>
-            <td style="border: 1px solid #bbb; padding: 6px;">
+            <td style="border: 1px solid #bbb; padding: 6px; vertical-align: top;">
               <strong>Remox ${i+1}</strong><br>
               Material: ${material}<br>
-              Formato: ${largura.toFixed(0)}×${altura.toFixed(0)}mm<br>
+              Formato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm<br>
               SKU: ${sku}<br>
               Cores: ${cor}<br>
               Acab: ${acabamento}
@@ -341,12 +374,12 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         </table>
         <div class="section-divider"></div>
         <div style="background-color: #f9e6e6; color: red; font-weight: bold; padding: 8px; margin-top: 10px;">
-          *Para agilizar a impressão, pedimos que arquivos sejam enviados em pdf vetorizado;<br>
-          *Para impressão em Bopp Metalizado/Transparente o arquivo recebido pela Diff deve conter o mapa de branco, caso contrário será adicionado 1 dia a mais no prazo de entrega;<br>
-          *A Diff só se responsabiliza por cores exatas de trabalho, quando a mesma receber amostra física ou prova de cor do cliente;<br>
-          *A impressão só será feita após aprovação por e-mail do arquivo: "layout de aprovação";<br>
-          *Prazo de Entrega começa a contar após aprovação do "Layout de aprovação";<br>
-          *Haverá atualização de valor, caso formato/quantidade final do rótulo seja diferente do proposto inicialmente.
+          * Para agilizar a impressão, pedimos que arquivos sejam enviados em pdf vetorizado;<br>
+          * Para impressão em Bopp Metalizado/Transparente o arquivo recebido pela Diff deve conter o mapa de branco, caso contrário será adicionado 1 dia a mais no prazo de entrega;<br>
+          * A Diff só se responsabiliza por cores exatas de trabalho, quando a mesma receber amostra física ou prova de cor do cliente;<br>
+          * A impressão só será feita após aprovação por e-mail do arquivo: "layout de aprovação";<br>
+          * Prazo de Entrega começa a contar após aprovação do "Layout de aprovação";<br>
+          * Haverá atualização de valor, caso formato/quantidade final do rótulo seja diferente do proposto inicialmente.
         </div>
       `;
 
@@ -364,10 +397,14 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         const acabamento = item.querySelector(".acabamento").value;
         const cola = item.querySelector(".cola").value;
         const cor = item.querySelector(".cores").value;
-        const largura = parseFloat(item.querySelector(".largura").value) + 3;
-        const altura = parseFloat(item.querySelector(".altura").value) + 3;
-        const qtde = parseInt(item.querySelector(".quantidade").value);
-        const preco = parseFloat(item.querySelector(".preco").value);
+        const larguraInput = parseFloat(item.querySelector(".largura").value);
+        const alturaInput = parseFloat(item.querySelector(".altura").value);
+        const largura = isNaN(larguraInput) ? 0 : larguraInput + 3;
+        const altura = isNaN(alturaInput) ? 0 : alturaInput + 3;
+        const qtdeInput = parseInt(item.querySelector(".quantidade").value);
+        const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
+        const precoInput = parseFloat(item.querySelector(".preco").value);
+        const preco = isNaN(precoInput) ? 0 : precoInput;
         const sku = item.querySelector(".sku").value || "-";
         const obs = item.querySelector(".obs").value;
         const area = (largura * altura) / 1000000;
@@ -375,7 +412,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
           ? 225
           : areaTotal * preco;
-        const valorUnitario = (valorTotal / qtde).toFixed(4);
+        const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : "0.0000";
 
         texto += `Item ${i+1}:%0A• Material: ${material}%0A• Formato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm%0A• SKU: ${sku}%0A• Cores: ${cor}%0A• Acab: ${acabamento}%0A• Qtde: ${qtde}%0A• Un.: Un%0A• Valor Unitário: R$ ${valorUnitario}%0A• Total: R$ ${valorTotal.toFixed(2)}`;
         if (obs) texto += `%0A• Obs: ${obs}`;
@@ -406,10 +443,11 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       const margem = 40;
       const larguraUtil = larguraPagina - margem * 2;
 
-      const nome = document.getElementById("nomeCliente").value;
-      const cnpj = document.getElementById("cnpjCliente").value;
-      const tel = document.getElementById("telefoneCliente").value;
-      const email = document.getElementById("emailCliente").value;
+      // Resgata dados do cliente
+      const nome = document.getElementById("nomeCliente").value || "-";
+      const cnpj = document.getElementById("cnpjCliente").value || "-";
+      const tel = document.getElementById("telefoneCliente").value || "-";
+      const email = document.getElementById("emailCliente").value || "-";
       const numOrcamento = document.getElementById("numOrcamento").value;
       const data = new Date().toLocaleDateString('pt-BR');
 
@@ -420,15 +458,14 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       doc.setFont("Helvetica", "bold");
       doc.text("PROPOSTA COMERCIAL " + numOrcamento, larguraPagina / 2, 40, { align: "center" });
 
-      // Desenhar linha abaixo
+      // Linha horizontal
       doc.setLineWidth(1);
       doc.setDrawColor(0);
       doc.line(margem, 50, larguraPagina - margem, 50);
 
-      // Logo (substituir por base64 ou caminho se possuir)
-      // Por enquanto, desenhamos um círculo amarelo como placeholder
-      doc.setFillColor(255, 204, 0); // amarelo
-      doc.circle(margem + 40, 90, 30, 'F'); 
+      // Logo placeholder (círculo amarelo) à esquerda
+      doc.setFillColor(255, 204, 0);
+      doc.circle(margem + 40, 90, 30, 'F');
       doc.setFontSize(12);
       doc.setFont("Helvetica", "bold");
       doc.text("diff.", margem + 70, 100);
@@ -450,46 +487,58 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         yTexto += 12;
       });
 
-      // Linha separadora
+      // Linha separadora abaixo do cabeçalho
       doc.setLineWidth(1);
       doc.line(margem, yTexto + 4, larguraPagina - margem, yTexto + 4);
       let y = yTexto + 20;
 
       // ------------------------------------------------------------
-      // 2) Dados do cliente (abaixo do cabeçalho)
+      // 2) Dados do cliente
       // ------------------------------------------------------------
       doc.setFontSize(10);
       doc.setFont("Helvetica", "bold");
       doc.text("Cliente:", margem, y);
       doc.setFont("Helvetica", "normal");
-      doc.text(nome || "-", margem + 50, y);
+      doc.text(nome, margem + 50, y);
       y += 14;
       doc.setFont("Helvetica", "bold");
       doc.text("CNPJ:", margem, y);
       doc.setFont("Helvetica", "normal");
-      doc.text(cnpj || "-", margem + 30, y);
+      doc.text(cnpj, margem + 30, y);
       y += 14;
       doc.setFont("Helvetica", "bold");
       doc.text("Telefone:", margem, y);
       doc.setFont("Helvetica", "normal");
-      doc.text(tel || "-", margem + 60, y);
+      doc.text(tel, margem + 60, y);
       y += 14;
       doc.setFont("Helvetica", "bold");
       doc.text("E-mail:", margem, y);
       doc.setFont("Helvetica", "normal");
-      doc.text(email || "-", margem + 40, y);
+      doc.text(email, margem + 40, y);
       y += 20;
 
       // ------------------------------------------------------------
       // 3) Tabela de Itens
       // ------------------------------------------------------------
-      // Cabeçalho da tabela
-      const colWidths = [30, larguraUtil * 0.45, 40, 30, 90, 70]; 
+      // Definição de larguras de colunas
+      const colWidths = [
+        30,
+        larguraUtil * 0.45,
+        40,
+        30,
+        90,
+        70
+      ];
       let x = margem;
-      const headerBgColor = "#dddddd";
-      doc.setFillColor( headerBgColor );
 
-      // Tabela Header  (fundo cinza)
+      // Cabeçalho da tabela
+      const headerBgColor = "#dddddd";
+      doc.setFillColor(headerBgColor);
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.5);
+      doc.setFontSize(9);
+      doc.setFont("Helvetica", "bold");
+
       doc.rect(x, y, colWidths[0], 20, "F");
       doc.rect(x + colWidths[0], y, colWidths[1], 20, "F");
       doc.rect(x + colWidths[0] + colWidths[1], y, colWidths[2], 20, "F");
@@ -497,10 +546,6 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3], y, colWidths[4], 20, "F");
       doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4], y, colWidths[5], 20, "F");
 
-      doc.setDrawColor(0);
-      doc.setLineWidth(0.5);
-      doc.setFontSize(9);
-      doc.setFont("Helvetica", "bold");
       doc.text("Itens", x + 5, y + 13);
       doc.text("Descrição dos Produtos", x + colWidths[0] + 5, y + 13);
       doc.text("Qtd.", x + colWidths[0] + colWidths[1] + 5, y + 13);
@@ -517,75 +562,82 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         const acabamento = item.querySelector(".acabamento").value;
         const cola = item.querySelector(".cola").value;
         const cor = item.querySelector(".cores").value;
-        const larguraItem = parseFloat(item.querySelector(".largura").value) + 3;
-        const alturaItem = parseFloat(item.querySelector(".altura").value) + 3;
-        const qtde = parseInt(item.querySelector(".quantidade").value);
-        const preco = parseFloat(item.querySelector(".preco").value);
+        const larguraInput = parseFloat(item.querySelector(".largura").value);
+        const alturaInput = parseFloat(item.querySelector(".altura").value);
+        const largura = isNaN(larguraInput) ? 0 : larguraInput + 3;
+        const altura = isNaN(alturaInput) ? 0 : alturaInput + 3;
+        const qtdeInput = parseInt(item.querySelector(".quantidade").value);
+        const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
+        const precoInput = parseFloat(item.querySelector(".preco").value);
+        const preco = isNaN(precoInput) ? 0 : precoInput;
         const sku = item.querySelector(".sku").value || "-";
         const obs = item.querySelector(".obs").value;
-        const area = (larguraItem * alturaItem) / 1000000;
+        const area = (largura * altura) / 1000000;
         const areaTotal = area * qtde;
         const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
           ? 225
           : areaTotal * preco;
-        const valorUnitario = (valorTotal / qtde).toFixed(4);
+        const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : "0.0000";
+
         totalGeral += valorTotal;
 
-        // Celula "Itens"
+        // Coluna "Itens"
         doc.setFont("Helvetica", "bold");
         doc.text(String(i+1), x + 5, y + 10);
         doc.setFont("Helvetica", "normal");
 
-        // Celula "Descrição dos Produtos"
-        let descText = `Remox ${i+1}\nMaterial: ${material}\nFormato: ${larguraItem.toFixed(0)}×${alturaItem.toFixed(0)} mm\nSKU: ${sku}\nCores: ${cor}\nAcab: ${acabamento}`;
-        doc.text(descText, x + colWidths[0] + 5, y + 10);
+        // Coluna "Descrição dos Produtos"
+        const descLines = doc.splitTextToSize(
+          `Remox ${i+1}\nMaterial: ${material}\nFormato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm\nSKU: ${sku}\nCores: ${cor}\nAcab: ${acabamento}`,
+          colWidths[1] - 10
+        );
+        doc.text(descLines, x + colWidths[0] + 5, y + 10);
 
-        // Celula "Qtd."
+        // Coluna "Qtd."
         doc.text(String(qtde), x + colWidths[0] + colWidths[1] + 15, y + 10);
 
-        // Celula "Un."
+        // Coluna "Un."
         doc.text("Un.", x + colWidths[0] + colWidths[1] + colWidths[2] + 5, y + 10);
 
-        // Celula "Preço c/ Impostos"
+        // Coluna "Preço c/ Impostos"
         doc.text(`R$ ${valorUnitario}`, x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + 5, y + 10);
 
-        // Celula "Total (R$)"
+        // Coluna "Total (R$)"
         doc.text(`R$ ${valorTotal.toFixed(2)}`, x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] + 5, y + 10);
 
-        // Linhas horizontais e verticais
+        // Desenha retângulo para a linha inteira
         doc.setLineWidth(0.5);
-        doc.rect(margem, y - 2, larguraUtil, 24, "S");
+        doc.rect(margem, y - 2, larguraUtil, 40, "S");
 
-        y += 26;
-        if (y > 700) { 
+        y += 44;
+        if (y > 720) { 
           doc.addPage(); 
           y = 40; 
         }
       });
 
       // Total Geral
-      if (y > 700) { 
-        doc.addPage(); 
-        y = 40; 
+      if (y > 700) {
+        doc.addPage();
+        y = 40;
       }
       doc.setFont("Helvetica", "bold");
+      doc.setFontSize(12);
       doc.text(`TOTAL R$: R$ ${totalGeral.toFixed(2)}`, margem + larguraUtil - 150, y + 10, { align: "left" });
       y += 30;
 
       // ------------------------------------------------------------
       // 4) Termos e Condições & OBS no final do PDF
       // ------------------------------------------------------------
-      // Linha divisória antes dos termos
       if (y > 700) {
         doc.addPage();
         y = 40;
       }
-      doc.setDrawColor(0);
+      // Linha antes dos termos
       doc.setLineWidth(0.5);
       doc.line(margem, y, larguraPagina - margem, y);
       y += 12;
 
-      // Termos e Condições
       const validade = document.getElementById("validadeProposta").value;
       const prazoEntrega = document.getElementById("prazoEntrega").value;
       const condPagamento = document.getElementById("condPagamento").value;
@@ -606,11 +658,11 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       doc.text(`Frete: ${frete}`, margem, y); y += 12;
       doc.text(`Contato Comercial: ${contato}`, margem, y); y += 20;
 
-      // Linha divisória antes de OBS
       if (y > 700) {
         doc.addPage();
         y = 40;
       }
+      // Linha antes das observações
       doc.setLineWidth(0.5);
       doc.line(margem, y, larguraPagina - margem, y);
       y += 12;
@@ -628,20 +680,20 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
           doc.addPage();
           y = 40;
         }
-        doc.text(`* ${line}`, margem + 5, y);
-        y += 12;
+        const wrapped = doc.splitTextToSize(line, larguraUtil - 10);
+        doc.text(wrapped, margem + 5, y);
+        y += wrapped.length * 12;
       });
 
-      // Linha final
       if (y > 700) {
         doc.addPage();
         y = 40;
       }
+      // Linha final
       doc.setTextColor(0, 0, 0);
       doc.setLineWidth(0.5);
       doc.line(margem, y + 10, larguraPagina - margem, y + 10);
 
-      // Salvar PDF
       doc.save(`Proposta_Comercial_${numOrcamento}.pdf`);
     }
 
