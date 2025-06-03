@@ -34,6 +34,10 @@
       border-radius: 4px;
       font-size: 14px;
       box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    input.error, select.error {
+      border-color: #e74c3c;
     }
     /* Estilo chamativo e cor vermelha para a textarea de OBS gerais */
     #obsGerais {
@@ -54,12 +58,34 @@
       margin-bottom: 15px;
       border-radius: 8px;
       background: #fafafa;
+      position: relative;
     }
     .item h3 {
       margin-top: 0;
       margin-bottom: 10px;
       font-size: 18px;
       color: #333;
+    }
+    .btnExcluirItem {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background-color 0.2s ease;
+    }
+    .btnExcluirItem:hover {
+      background-color: #c0392b;
+    }
+    .previewValores {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #555;
     }
     button {
       margin-top: 15px;
@@ -102,6 +128,12 @@
       border-top: 1px solid #ccc;
       margin: 20px 0;
     }
+    @media (max-width: 600px) {
+      body { margin: 10px; }
+      .wrapper { padding: 10px; }
+      input, select, textarea { font-size: 12px; }
+      button { font-size: 14px; padding: 8px 12px; }
+    }
   </style>
 </head>
 <body>
@@ -124,7 +156,7 @@
     <input type="email" id="emailCliente" required />
 
     <div id="itensContainer"></div>
-    <button onclick="adicionarItem()">Adicionar Item</button>
+    <button type="button" onclick="adicionarItem()">Adicionar Item</button>
 
     <!-- Termos e Condições editáveis -->
     <div class="section-divider"></div>
@@ -173,8 +205,8 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
 
     <div class="section-divider"></div>
 
-    <button onclick="calcularOrcamento()">Calcular Orçamento + Gerar PDF</button>
-    <button onclick="gerarPDF()">Gerar PDF (sem recálculo)</button>
+    <button type="button" onclick="calcularOrcamento()">Calcular Orçamento + Gerar PDF</button>
+    <button type="button" onclick="gerarPDF()">Gerar PDF (sem recálculo)</button>
     <a id="btnWhats" target="_blank">Enviar via WhatsApp</a>
 
     <div id="resultado"></div>
@@ -231,14 +263,15 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       div.className = "item";
       div.innerHTML = `
         <h3>Item ${contador + 1}</h3>
+        <button type="button" class="btnExcluirItem" onclick="excluirItem(this)">Excluir Item</button>
         <label>Material:</label>
-        <select class="material">${criarSelect(materiais)}</select>
+        <select class="material" required>${criarSelect(materiais)}</select>
         <label>Acabamento:</label>
-        <select class="acabamento">${criarSelect(acabamentos)}</select>
+        <select class="acabamento" required>${criarSelect(acabamentos)}</select>
         <label>Tipo de Cola:</label>
-        <select class="cola">${criarSelect(colas)}</select>
+        <select class="cola" required>${criarSelect(colas)}</select>
         <label>Cores:</label>
-        <select class="cores">${criarSelect(cores)}</select>
+        <select class="cores" required>${criarSelect(cores)}</select>
         <label>Largura (mm):</label>
         <input type="number" class="largura" required />
         <label>Altura (mm):</label>
@@ -253,10 +286,28 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         <textarea class="obs" rows="2"></textarea>
         <label>Arte (imagem):</label>
         <input type="file" class="arte" accept="image/*" onchange="carregarImagem(this, ${contador})" />
+        <div class="previewValores">
+          <span>Valor Unitário: R$ <span class="previewUnitario">0.0000</span></span><br/>
+          <span>Valor Total: R$ <span class="previewTotal">0.00</span></span>
+        </div>
       `;
       container.appendChild(div);
       imagens.push(null);
       contador++;
+    }
+
+    function excluirItem(botao) {
+      const itemDiv = botao.closest(".item");
+      itemDiv.remove();
+      recalcularSequenciaItens();
+    }
+
+    function recalcularSequenciaItens() {
+      const itens = document.querySelectorAll(".item");
+      itens.forEach((div, idx) => {
+        div.querySelector("h3").textContent = `Item ${idx + 1}`;
+      });
+      contador = itens.length;
     }
 
     function carregarImagem(input, index) {
@@ -265,22 +316,88 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       if (input.files[0]) reader.readAsDataURL(input.files[0]);
     }
 
-    // Formata CNPJ: 00000000000000 → 00.000.000/0000-00
-    function formatarCNPJ(cnpj) {
-      const nums = cnpj.replace(/\D/g, "").padStart(14, "0");
-      return `${nums.slice(0,2)}.${nums.slice(2,5)}.${nums.slice(5,8)}/${nums.slice(8,12)}-${nums.slice(12)}`;
+    // Formata CNPJ em tempo real: 00000000000000 → 00.000.000/0000-00
+    document.getElementById("cnpjCliente").addEventListener("input", function(e) {
+      let v = e.target.value.replace(/\D/g, "");
+      if (v.length > 14) v = v.slice(0, 14);
+      v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+      v = v.replace(/^(\d{2}\.\d{3})(\d)/, "$1.$2");
+      v = v.replace(/^(\d{2}\.\d{3}\.\d{3})(\d)/, "$1/$2");
+      v = v.replace(/^(\d{2}\.\d{3}\.\d{3}\/\d{4})(\d)/, "$1-$2");
+      e.target.value = v;
+    });
+
+    // Formata telefone em tempo real: 47988081212 → (47) 98808-1212
+    document.getElementById("telefoneCliente").addEventListener("input", function(e) {
+      let v = e.target.value.replace(/\D/g, "");
+      if (v.length > 11) v = v.slice(0, 11);
+      v = v.replace(/^(\d{2})(\d)/, "($1) $2");
+      v = v.replace(/(\d{5})(\d)/, "$1-$2");
+      e.target.value = v;
+    });
+
+    // Atualiza preview em tempo real para cada item
+    document.getElementById("itensContainer").addEventListener("input", function(e) {
+      const itemDiv = e.target.closest(".item");
+      if (itemDiv) atualizarPreviewItem(itemDiv);
+    });
+
+    function atualizarPreviewItem(itemDiv) {
+      const larguraInput = parseFloat(itemDiv.querySelector(".largura").value);
+      const alturaInput = parseFloat(itemDiv.querySelector(".altura").value);
+      const largura = isNaN(larguraInput) ? 0 : larguraInput + 3;
+      const altura = isNaN(alturaInput) ? 0 : alturaInput + 3;
+
+      const qtdeInput = parseInt(itemDiv.querySelector(".quantidade").value);
+      const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
+
+      const precoInput = parseFloat(itemDiv.querySelector(".preco").value);
+      const preco = isNaN(precoInput) ? 0 : precoInput;
+
+      const area = (largura * altura) / 1000000;
+      const areaTotal = area * qtde;
+      const material = itemDiv.querySelector(".material").value;
+      const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
+        ? 225
+        : areaTotal * preco;
+      const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : "0.0000";
+
+      itemDiv.querySelector(".previewUnitario").textContent = valorUnitario;
+      itemDiv.querySelector(".previewTotal").textContent = valorTotal.toFixed(2);
     }
 
-    // Formata telefone: 47988081212 → (47) 98808-1212
-    function formatarTelefone(tel) {
-      const nums = tel.replace(/\D/g, "").padStart(10, "0");
-      const ddd = nums.slice(0,2);
-      const part1 = nums.slice(2,7);
-      const part2 = nums.slice(7);
-      return `(${ddd}) ${part1}-${part2}`;
+    function validarCampos() {
+      let valido = true;
+      // Valida campos gerais
+      ["nomeCliente", "cnpjCliente", "telefoneCliente", "emailCliente", "validadeProposta", "contatoComercial"].forEach(id => {
+        const campo = document.getElementById(id);
+        if (!campo.value.trim()) {
+          campo.classList.add("error");
+          valido = false;
+        } else {
+          campo.classList.remove("error");
+        }
+      });
+      // Valida itens
+      document.querySelectorAll(".item").forEach(itemDiv => {
+        const camposObrig = itemDiv.querySelectorAll("select[required], input[required]");
+        camposObrig.forEach(campo => {
+          if (!campo.value || campo.value.trim() === "") {
+            campo.classList.add("error");
+            valido = false;
+          } else {
+            campo.classList.remove("error");
+          }
+        });
+      });
+      if (!valido) {
+        alert("Por favor, preencha todos os campos obrigatórios em vermelho.");
+      }
+      return valido;
     }
 
     function calcularOrcamento() {
+      if (!validarCampos()) return;
       renderizarResultado();       // Atualiza a exibição na página
       gerarLinkWhatsApp();         // Exibe o link de envio
       gerarPDF();                  // Gera o PDF
@@ -288,10 +405,8 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
 
     function renderizarResultado() {
       const nome = document.getElementById("nomeCliente").value || "-";
-      const cnpjRaw = document.getElementById("cnpjCliente").value || "";
-      const cnpj = cnpjRaw ? formatarCNPJ(cnpjRaw) : "-";
-      const telRaw = document.getElementById("telefoneCliente").value || "";
-      const tel = telRaw ? formatarTelefone(telRaw) : "-";
+      const cnpj = document.getElementById("cnpjCliente").value || "-";
+      const tel = document.getElementById("telefoneCliente").value || "-";
       const email = document.getElementById("emailCliente").value || "-";
       const numOrcamento = document.getElementById("numOrcamento").value;
       const data = new Date().toLocaleDateString('pt-BR');
@@ -325,7 +440,6 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       itens.forEach((item, i) => {
         const material = item.querySelector(".material").value;
         const acabamento = item.querySelector(".acabamento").value;
-        const cola = item.querySelector(".cola").value;
         const cor = item.querySelector(".cores").value;
         const larguraInput = parseFloat(item.querySelector(".largura").value);
         const alturaInput = parseFloat(item.querySelector(".altura").value);
@@ -402,7 +516,8 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
           * A Diff só se responsabiliza por cores exatas de trabalho, quando a mesma receber amostra física ou prova de cor do cliente;<br>
           * A impressão só será feita após aprovação por e-mail do arquivo: "layout de aprovação";<br>
           * Prazo de Entrega começa a contar após aprovação do "Layout de aprovação";<br>
-          * Haverá atualização de valor, caso formato/quantidade final do rótulo seja diferente do proposto inicialmente.
+          * Haverá atualização de valor, caso formato/quantidade <br>
+            final do rótulo seja diferente do proposto inicialmente.
         </div>
       `;
 
@@ -418,7 +533,6 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       itens.forEach((item, i) => {
         const material = item.querySelector(".material").value;
         const acabamento = item.querySelector(".acabamento").value;
-        const cola = item.querySelector(".cola").value;
         const cor = item.querySelector(".cores").value;
         const larguraInput = parseFloat(item.querySelector(".largura").value);
         const alturaInput = parseFloat(item.querySelector(".altura").value);
@@ -460,6 +574,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
     }
 
     async function gerarPDF() {
+      if (!validarCampos()) return;
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: 'pt', format: 'a4' });
       const larguraPagina = doc.internal.pageSize.getWidth();
@@ -468,10 +583,8 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
 
       // Resgata e formata dados do cliente
       const nome = document.getElementById("nomeCliente").value || "-";
-      const cnpjRaw = document.getElementById("cnpjCliente").value || "";
-      const cnpj = cnpjRaw ? formatarCNPJ(cnpjRaw) : "-";
-      const telRaw = document.getElementById("telefoneCliente").value || "";
-      const tel = telRaw ? formatarTelefone(telRaw) : "-";
+      const cnpj = document.getElementById("cnpjCliente").value || "-";
+      const tel = document.getElementById("telefoneCliente").value || "-";
       const email = document.getElementById("emailCliente").value || "-";
       const numOrcamento = document.getElementById("numOrcamento").value;
       const data = new Date().toLocaleDateString('pt-BR');
@@ -585,7 +698,6 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       document.querySelectorAll(".item").forEach((item, i) => {
         const material = item.querySelector(".material").value;
         const acabamento = item.querySelector(".acabamento").value;
-        const cola = item.querySelector(".cola").value;
         const cor = item.querySelector(".cores").value;
         const larguraInput = parseFloat(item.querySelector(".largura").value);
         const alturaInput = parseFloat(item.querySelector(".altura").value);
