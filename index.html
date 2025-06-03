@@ -42,6 +42,7 @@
       font-size: 16px;
       border-color: #e74c3c;
       background-color: #fdecea;
+      max-width: 90%; /* diminui largura para caber no PDF */
     }
     textarea {
       resize: vertical;
@@ -114,10 +115,10 @@
     <input type="text" id="nomeCliente" required />
 
     <label>CNPJ:</label>
-    <input type="text" id="cnpjCliente" />
+    <input type="text" id="cnpjCliente" placeholder="Somente números" />
 
     <label>Telefone:</label>
-    <input type="text" id="telefoneCliente" />
+    <input type="text" id="telefoneCliente" placeholder="Somente números" />
 
     <label>E-mail:</label>
     <input type="email" id="emailCliente" required />
@@ -264,6 +265,21 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       if (input.files[0]) reader.readAsDataURL(input.files[0]);
     }
 
+    // Formata CNPJ: 00000000000000 → 00.000.000/0000-00
+    function formatarCNPJ(cnpj) {
+      const nums = cnpj.replace(/\D/g, "").padStart(14, "0");
+      return `${nums.slice(0,2)}.${nums.slice(2,5)}.${nums.slice(5,8)}/${nums.slice(8,12)}-${nums.slice(12)}`;
+    }
+
+    // Formata telefone: 47988081212 → (47) 98808-1212
+    function formatarTelefone(tel) {
+      const nums = tel.replace(/\D/g, "").padStart(10, "0");
+      const ddd = nums.slice(0,2);
+      const part1 = nums.slice(2,7);
+      const part2 = nums.slice(7);
+      return `(${ddd}) ${part1}-${part2}`;
+    }
+
     function calcularOrcamento() {
       renderizarResultado();       // Atualiza a exibição na página
       gerarLinkWhatsApp();         // Exibe o link de envio
@@ -272,8 +288,10 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
 
     function renderizarResultado() {
       const nome = document.getElementById("nomeCliente").value || "-";
-      const cnpj = document.getElementById("cnpjCliente").value || "-";
-      const tel = document.getElementById("telefoneCliente").value || "-";
+      const cnpjRaw = document.getElementById("cnpjCliente").value || "";
+      const cnpj = cnpjRaw ? formatarCNPJ(cnpjRaw) : "-";
+      const telRaw = document.getElementById("telefoneCliente").value || "";
+      const tel = telRaw ? formatarTelefone(telRaw) : "-";
       const email = document.getElementById("emailCliente").value || "-";
       const numOrcamento = document.getElementById("numOrcamento").value;
       const data = new Date().toLocaleDateString('pt-BR');
@@ -283,7 +301,12 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       let resultadoHTML = `
         <h3>Proposta Comercial ${numOrcamento}</h3>
         <p><strong>Data:</strong> ${data}</p>
-        <p><strong>Cliente:</strong> ${nome} | <strong>CNPJ:</strong> ${cnpj} | <strong>Telefone:</strong> ${tel} | <strong>E-mail:</strong> ${email}</p>
+        <p>
+          <strong>Cliente:</strong> ${nome} | 
+          <strong>CNPJ:</strong> ${cnpj} | 
+          <strong>Telefone:</strong> ${tel} | 
+          <strong>E-mail:</strong> ${email}
+        </p>
         <div style="overflow-x:auto; margin-top: 10px;">
         <table style="width:100%; border-collapse: collapse;">
           <thead style="background-color: #dddddd;">
@@ -373,7 +396,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
           <tr><td><strong>Contato Comercial:</strong></td><td>${contato}</td></tr>
         </table>
         <div class="section-divider"></div>
-        <div style="background-color: #f9e6e6; color: red; font-weight: bold; padding: 8px; margin-top: 10px;">
+        <div style="background-color: #f9e6e6; color: red; font-weight: bold; padding: 8px; margin-top: 10px; max-width: 90%;">
           * Para agilizar a impressão, pedimos que arquivos sejam enviados em pdf vetorizado;<br>
           * Para impressão em Bopp Metalizado/Transparente o arquivo recebido pela Diff deve conter o mapa de branco, caso contrário será adicionado 1 dia a mais no prazo de entrega;<br>
           * A Diff só se responsabiliza por cores exatas de trabalho, quando a mesma receber amostra física ou prova de cor do cliente;<br>
@@ -443,10 +466,12 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       const margem = 40;
       const larguraUtil = larguraPagina - margem * 2;
 
-      // Resgata dados do cliente
+      // Resgata e formata dados do cliente
       const nome = document.getElementById("nomeCliente").value || "-";
-      const cnpj = document.getElementById("cnpjCliente").value || "-";
-      const tel = document.getElementById("telefoneCliente").value || "-";
+      const cnpjRaw = document.getElementById("cnpjCliente").value || "";
+      const cnpj = cnpjRaw ? formatarCNPJ(cnpjRaw) : "-";
+      const telRaw = document.getElementById("telefoneCliente").value || "";
+      const tel = telRaw ? formatarTelefone(telRaw) : "-";
       const email = document.getElementById("emailCliente").value || "-";
       const numOrcamento = document.getElementById("numOrcamento").value;
       const data = new Date().toLocaleDateString('pt-BR');
@@ -458,7 +483,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       doc.setFont("Helvetica", "bold");
       doc.text("PROPOSTA COMERCIAL " + numOrcamento, larguraPagina / 2, 40, { align: "center" });
 
-      // Linha horizontal
+      // Linha horizontal abaixo do título
       doc.setLineWidth(1);
       doc.setDrawColor(0);
       doc.line(margem, 50, larguraPagina - margem, 50);
@@ -581,16 +606,24 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
 
         totalGeral += valorTotal;
 
+        // Determina quantas linhas a descrição vai ocupar (para altura dinâmica)
+        const descText = `Remox ${i+1}\nMaterial: ${material}\nFormato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm\nSKU: ${sku}\nCores: ${cor}\nAcab: ${acabamento}`;
+        const descLines = doc.splitTextToSize(descText, colWidths[1] - 10);
+        const lineHeight = 12;
+        const rowHeight = descLines.length * lineHeight + 10; // +10 para espaçamento extra
+
+        // Se ultrapassar próximo da margem inferior, cria nova página
+        if (y + rowHeight > 740) {
+          doc.addPage();
+          y = 40;
+        }
+
         // Coluna "Itens"
         doc.setFont("Helvetica", "bold");
         doc.text(String(i+1), x + 5, y + 10);
         doc.setFont("Helvetica", "normal");
 
         // Coluna "Descrição dos Produtos"
-        const descLines = doc.splitTextToSize(
-          `Remox ${i+1}\nMaterial: ${material}\nFormato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm\nSKU: ${sku}\nCores: ${cor}\nAcab: ${acabamento}`,
-          colWidths[1] - 10
-        );
         doc.text(descLines, x + colWidths[0] + 5, y + 10);
 
         // Coluna "Qtd."
@@ -605,15 +638,11 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         // Coluna "Total (R$)"
         doc.text(`R$ ${valorTotal.toFixed(2)}`, x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] + 5, y + 10);
 
-        // Desenha retângulo para a linha inteira
+        // Desenha retângulo para a linha inteira com altura adaptativa
         doc.setLineWidth(0.5);
-        doc.rect(margem, y - 2, larguraUtil, 40, "S");
+        doc.rect(margem, y - 2, larguraUtil, rowHeight, "S");
 
-        y += 44;
-        if (y > 720) { 
-          doc.addPage(); 
-          y = 40; 
-        }
+        y += rowHeight + 4;
       });
 
       // Total Geral
@@ -633,6 +662,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         doc.addPage();
         y = 40;
       }
+
       // Linha antes dos termos
       doc.setLineWidth(0.5);
       doc.line(margem, y, larguraPagina - margem, y);
@@ -667,7 +697,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       doc.line(margem, y, larguraPagina - margem, y);
       y += 12;
 
-      // OBS gerais em vermelho
+      // OBS gerais em vermelho, largura reduzida (90% da área útil)
       doc.setFont("Helvetica", "bold");
       doc.setFontSize(11);
       doc.setTextColor(255, 0, 0);
@@ -675,12 +705,13 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
 
       doc.setFont("Helvetica", "normal");
       doc.setFontSize(10);
+      const obsWidth = (larguraUtil * 0.9);
       obsGerais.forEach(line => {
         if (y > 700) {
           doc.addPage();
           y = 40;
         }
-        const wrapped = doc.splitTextToSize(line, larguraUtil - 10);
+        const wrapped = doc.splitTextToSize(line, obsWidth);
         doc.text(wrapped, margem + 5, y);
         y += wrapped.length * 12;
       });
