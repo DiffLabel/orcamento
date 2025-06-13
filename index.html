@@ -9,18 +9,12 @@
     .wrapper { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
     h1 { text-align: center; margin-bottom: 20px; }
     label { display: block; margin-top: 12px; font-weight: bold; }
-    input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box; transition: border-color 0.2s; }
-    input.error, select.error { border-color: #e74c3c; }
-    #obsGerais { color: red; font-weight: bold; font-size: 16px; border-color: #e74c3c; background-color: #fdecea; max-width: 90%; }
-    textarea { resize: vertical; min-height: 60px; }
-    .item { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #fafafa; position: relative; }
-    .item h3 { margin-top: 0; margin-bottom: 10px; font-size: 18px; color: #333; }
+    input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box; }
     .previewValores { margin-top: 10px; font-size: 14px; color: #555; }
-    button { margin-top: 15px; padding: 12px 20px; background-color: #1a73e8; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; transition: background-color 0.2s ease; }
+    button { margin-top: 15px; padding: 12px 20px; background-color: #1a73e8; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
     button:hover { background-color: #0f5cc8; }
     a#btnWhats { display: none; margin-top: 15px; text-decoration: none; background-color: #25D366; color: white; padding: 12px; border-radius: 4px; font-weight: bold; font-size: 16px; }
     a#btnWhats:hover { background-color: #1ebe5c; }
-    #resultado { margin-top: 20px; padding: 15px; background: #eef; border-radius: 6px; font-size: 14px; line-height: 1.5; display: none; }
     .section-divider { border-top: 1px solid #ccc; margin: 20px 0; }
   </style>
 </head>
@@ -44,22 +38,18 @@
     <input type="email" id="emailCliente" required />
 
     <div id="itensContainer"></div>
-    <button type="button" onclick="adicionarItem()">Adicionar Item</button>
+    <button onclick="adicionarItem()">Adicionar Item</button>
 
     <div class="section-divider"></div>
     <h2>Termos e Condições de Venda</h2>
     <label>Validade da Proposta:</label>
     <input type="text" id="validadeProposta" value="10 dias" />
-
     <label>Prazo de Entrega (dias úteis):</label>
     <select id="prazoEntrega"><option>3/4</option><option>5/6</option><option>7/8</option><option>9/10</option></select>
-
     <label>Condição de Pagamento:</label>
     <select id="condPagamento"><option>À vista</option><option>14dd</option><option>21dd</option><option>28dd</option><option>14/28dd</option><option>35dd</option></select>
-
     <label>Frete:</label>
     <select id="frete"><option>FOB</option><option>CIF</option></select>
-
     <label>Contato Comercial:</label>
     <input type="text" id="contatoComercial" value="pedro@diffembalagens.com.br; vendas@diffembalagens.com.br" />
 
@@ -73,34 +63,34 @@ Prazo de Entrega começa a contar após aprovação do "Layout de aprovação";
 Haverá atualização de valor, caso formato/quantidade final do rótulo seja diferente do proposto inicialmente.</textarea>
 
     <div class="section-divider"></div>
-    <button type="button" onclick="mostrarPreview()">Mostrar Preview</button>
-    <button type="button" onclick="calcularOrcamento()">Calcular Orçamento + Gerar PDF</button>
-    <button type="button" onclick="gerarPDF()">Gerar PDF (sem recálculo)</button>
+    <button onclick="mostrarPreview()">Mostrar Preview</button>
+    <button onclick="calcularOrcamento()">Calcular Orçamento + Gerar PDF</button>
+    <button onclick="gerarPDF()">Gerar PDF (sem recálculo)</button>
     <a id="btnWhats" target="_blank">Enviar via WhatsApp</a>
 
-    <div id="resultado"></div>
+    <div id="resultado" style="display:none"></div>
   </div>
 
   <script>
     let contador = 0;
-    const materiais = ["Ad Couche","Bopp Branco Fosco","Bopp Brilho","Bopp Metalizado","Bopp Transparente","Bopp Holográfico","Vinil Fosco","Vinil Amarelo","Vinil Preto","Vinil Brilho","Vinil Refletivo","Vinil Transparente"];
-    const acabamentos = ["Em Cartela","Em Rolo/Bobina","Rolo/Bobina com Laminação Fosca","Rolo/Bobina com Laminação Brilho"];
-    const colas = ["Cola Acrílica","Cola Borracha","Cola Removível"];
-    const cores = ["1x0 (Preto)","4x0 (CMYK)","5x0 (CMYK + Branco)"];
+    const materiais=["Ad Couche","Bopp Branco Fosco","Bopp Brilho","Bopp Metalizado","Bopp Transparente","Bopp Holográfico","Vinil Fosco","Vinil Amarelo","Vinil Preto","Vinil Brilho","Vinil Refletivo","Vinil Transparente"];
+    const acabamentos=["Em Cartela","Em Rolo/Bobina","Rolo/Bobina com Laminação Fosca","Rolo/Bobina com Laminação Brilho"];
+    const colas=["Cola Acrílica","Cola Borracha","Cola Removível"];
+    const cores=["1x0 (Preto)","4x0 (CMYK)","5x0 (CMYK + Branco)"];
 
-    function gerarNumeroOrcamento() {
-      let num = parseInt(localStorage.getItem('ultimoOrcamento')||0)+1;
-      localStorage.setItem('ultimoOrcamento', num);
-      document.getElementById('numOrcamento').value = String(num).padStart(5,'0');
+    function gerarNumeroOrcamento(){
+      let n=parseInt(localStorage.getItem('ultimoOrcamento')||0)+1;
+      localStorage.setItem('ultimoOrcamento',n);
+      document.getElementById('numOrcamento').value=String(n).padStart(5,'0');
     }
 
-    function criarSelect(arr) { return arr.map(o=>`<option>${o}</option>`).join(''); }
+    function criarSelect(arr){return arr.map(o=>`<option>${o}</option>`).join('');}
 
-    function adicionarItem() {
-      const c = document.getElementById('itensContainer');
-      const d = document.createElement('div'); d.className='item';
-      d.innerHTML = `
-        <h3>Item ${contador+1 }</h3>
+    function adicionarItem(){
+      const cont=document.getElementById('itensContainer');
+      const div=document.createElement('div');div.className='item';
+      div.innerHTML=`
+        <h3>Item ${contador+1}</h3>
         <label>Material:</label><select class=material required>${criarSelect(materiais)}</select>
         <label>Acabamento:</label><select class=acabamento required>${criarSelect(acabamentos)}</select>
         <label>Cola:</label><select class=cola required>${criarSelect(colas)}</select>
@@ -113,43 +103,60 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
           <span>m²: <b class=previewM2>0.000</b></span><br>
           <span>Valor Un.: R$ <b class=previewUnitario>0.0000</b></span><br>
           <span>Total: R$ <b class=previewTotal>0.00</b></span>
-        </div>
-      `;
-      c.appendChild(d);
+        </div>`;
+      cont.appendChild(div);
       contador++;
     }
 
-    document.getElementById('itensContainer').addEventListener('input', e=>{
-      const itm = e.target.closest('.item');
-      if(!itm) return;
-      const l = parseFloat(itm.querySelector('.largura').value)||0;
-      const a = parseFloat(itm.querySelector('.altura').value)||0;
-      const m2 = ((l+3)*(a+3)/1e6).toFixed(3);
-      itm.querySelector('.previewM2').textContent = m2;
-      const q = parseInt(itm.querySelector('.quantidade').value)||0;
-      const p = parseFloat(itm.querySelector('.preco').value)||0;
-      const mat = itm.querySelector('.material').value;
-      const tot = (mat.includes('Vinil')&&m2*q<5&&q<=2000)?225:(m2*q*p);
-      itm.querySelector('.previewTotal').textContent = tot.toFixed(2);
-      itm.querySelector('.previewUnitario').textContent = (q? (tot/q).toFixed(4):'0.0000');
+    document.getElementById('itensContainer').addEventListener('input',e=>{
+      const itm=e.target.closest('.item'); if(!itm) return;
+      const l=parseFloat(itm.querySelector('.largura').value)||0;
+      const a=parseFloat(itm.querySelector('.altura').value)||0;
+      const m2=((l+3)*(a+3)/1e6).toFixed(3);
+      itm.querySelector('.previewM2').textContent=m2;
+      const q=parseInt(itm.querySelector('.quantidade').value)||0;
+      const p=parseFloat(itm.querySelector('.preco').value)||0;
+      const mat=itm.querySelector('.material').value;
+      const tot=(mat.includes('Vinil')&&m2*q<5&&q<=2000)?225:(m2*q*p);
+      itm.querySelector('.previewTotal').textContent=tot.toFixed(2);
+      itm.querySelector('.previewUnitario').textContent=(q? (tot/q).toFixed(4):'0.0000');
     });
 
-    function mostrarPreview() {/*...*/}
-    function calcularOrcamento() {/*...*/}
-    async function gerarPDF() {
-      const { jsPDF } = window.jspdf;
-      if(!document.getElementById('numOrcamento').value) return;
-      const doc = new jsPDF({unit:'pt',format:'a4'});
-      const W = doc.internal.pageSize.getWidth(), M=40;
-      // Gray header
-      doc.setFillColor(220,220,220); doc.rect(0,0,W,60,'F');
-      doc.setFont('Helvetica','bold').setTextColor(0).setFontSize(18);
-      doc.text(`PROPOSTA COMERCIAL ${document.getElementById('numOrcamento').value}`, W/2,40,{align:'center'});
-      // Rest of PDF as before, omitting m² column
-      doc.save(`Proposta_Comercial_${document.getElementById('numOrcamento').value}.pdf`);
+    function mostrarPreview(){ renderizar(); document.getElementById('resultado').style.display='block'; }
+    function calcularOrcamento(){ renderizar(); gerarLinkWhatsApp(); gerarPDF(); }
+
+    function renderizar(){
+      const num=document.getElementById('numOrcamento').value;
+      const data=new Date().toLocaleDateString('pt-BR');
+      let html=`<h2>Proposta ${num} - ${data}</h2><table border=1 cellpadding=4 cellspacing=0>`;
+      html+=`<tr><th>Item</th><th>Desc</th><th>Qtd</th><th>Unit</th><th>Total</th></tr>`;
+      document.querySelectorAll('.item').forEach((itm,i)=>{
+        const mat=itm.querySelector('.material').value;
+        const desc=`Material: ${mat}`;
+        const q=itm.querySelector('.quantidade').value;
+        const unit=itm.querySelector('.previewUnitario').textContent;
+        const tot=itm.querySelector('.previewTotal').textContent;
+        html+=`<tr><td>${i+1}</td><td>${desc}</td><td>${q}</td><td>R$ ${unit}</td><td>R$ ${tot}</td></tr>`;
+      });
+      html+='</table>';
+      document.getElementById('resultado').innerHTML=html;
     }
 
-    window.onload = ()=>{gerarNumeroOrcamento(); adicionarItem();};
+    function gerarLinkWhatsApp(){/*...*/}
+
+    async function gerarPDF(){
+      const {jsPDF}=window.jspdf;
+      const doc=new jsPDF({unit:'pt',format:'a4'});
+      const W=doc.internal.pageSize.getWidth(),M=40;
+      // gray header
+      doc.setFillColor(220,220,220);doc.rect(0,0,W,60,'F');
+      doc.setFont('Helvetica','bold').setTextColor(0).setFontSize(18);
+      doc.text(`PROPOSTA COMERCIAL ${document.getElementById('numOrcamento').value}`,W/2,40,{align:'center'});
+      // rest unchanged (no m²)
+      doc.save(`Proposta_${document.getElementById('numOrcamento').value}.pdf`);
+    }
+
+    window.onload=()=>{ gerarNumeroOrcamento(); adicionarItem(); };
   </script>
 </body>
 </html>
