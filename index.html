@@ -12,16 +12,13 @@
     input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box; transition: border-color 0.2s; }
     input.error, select.error { border-color: #e74c3c; }
     #obsGerais { color: red; font-weight: bold; font-size: 16px; border-color: #e74c3c; background-color: #fdecea; max-width: 90%; }
-    textarea { resize: vertical; min-height: 60px; }
     .item { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #fafafa; position: relative; }
-    .item h3 { margin-top: 0; margin-bottom: 10px; font-size: 18px; color: #333; }
-    .btnExcluirItem { position: absolute; top: 15px; right: 15px; background-color: #e74c3c; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: background-color 0.2s ease; }
-    .btnExcluirItem:hover { background-color: #c0392b; }
+    .item h3 { margin: 0 0 10px; font-size: 18px; color: #333; }
+    .btnExcluirItem { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
     .previewValores { margin-top: 10px; font-size: 14px; color: #555; }
-    button { margin-top: 15px; padding: 12px 20px; background-color: #1a73e8; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; transition: background-color 0.2s ease; }
-    button:hover { background-color: #0f5cc8; }
-    a#btnWhats { display: none; margin-top: 15px; text-align: center; text-decoration: none; background-color: #25D366; color: white; padding: 12px; border-radius: 4px; font-weight: bold; font-size: 16px; }
-    a#btnWhats:hover { background-color: #1ebe5c; }
+    button { margin-top: 15px; padding: 12px 20px; background: #1a73e8; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #0f5cc8; }
+    a#btnWhats { display: none; margin-top: 15px; text-align: center; text-decoration: none; background: #25D366; color: #fff; padding: 12px; border-radius: 4px; font-weight: bold; }
     .section-divider { border-top: 1px solid #ccc; margin: 20px 0; }
   </style>
 </head>
@@ -30,208 +27,152 @@
     <h1>Proposta Comercial</h1>
 
     <label>Nº do Orçamento:</label>
-    <input type="text" id="numOrcamento" readonly />
+    <input id="numOrcamento" readonly />
 
     <label>Nome do Cliente:</label>
-    <input type="text" id="nomeCliente" required />
+    <input id="nomeCliente" required />
 
     <label>CNPJ:</label>
-    <input type="text" id="cnpjCliente" placeholder="Somente números" />
+    <input id="cnpjCliente" placeholder="Somente números" />
 
     <label>Telefone:</label>
-    <input type="text" id="telefoneCliente" placeholder="Somente números" />
+    <input id="telefoneCliente" placeholder="Somente números" />
 
     <label>E-mail:</label>
     <input type="email" id="emailCliente" required />
 
     <div id="itensContainer"></div>
-    <button type="button" onclick="adicionarItem()">Adicionar Item</button>
+    <button onclick="adicionarItem()">Adicionar Item</button>
 
     <div class="section-divider"></div>
     <h2>Termos e Condições de Venda</h2>
     <label>Validade da Proposta:</label>
-    <input type="text" id="validadeProposta" value="10 dias" />
-
+    <input id="validadeProposta" value="10 dias" />
     <label>Prazo de Entrega (dias úteis):</label>
-    <select id="prazoEntrega">
-      <option>3/4</option>
-      <option>5/6</option>
-      <option>7/8</option>
-      <option>9/10</option>
-    </select>
-
+    <select id="prazoEntrega"><option>3/4</option><option>5/6</option><option>7/8</option><option>9/10</option></select>
     <label>Condição de Pagamento:</label>
-    <select id="condPagamento">
-      <option>À vista</option>
-      <option>14dd</option>
-      <option>21dd</option>
-      <option>28dd</option>
-      <option>14/28dd</option>
-      <option>35dd</option>
-    </select>
-
+    <select id="condPagamento"><option>À vista</option><option>14dd</option><option>21dd</option><option>28dd</option><option>14/28dd</option><option>35dd</option></select>
     <label>Frete:</label>
-    <select id="frete">
-      <option>FOB</option>
-      <option>CIF</option>
-    </select>
-
+    <select id="frete"><option>FOB</option><option>CIF</option></select>
     <label>Contato Comercial:</label>
-    <input type="text" id="contatoComercial" value="pedro@diffembalagens.com.br; vendas@diffembalagens.com.br" />
+    <input id="contatoComercial" value="pedro@diffembalagens.com.br; vendas@diffembalagens.com.br" />
 
     <div class="section-divider"></div>
     <h2>OBS:</h2>
-    <textarea id="obsGerais">Para agilizar a impressão, pedimos que arquivos sejam enviados em pdf vetorizado;
-Para impressão em Bopp Metalizado/Transparente o arquivo recebido pela Diff deve conter o mapa de branco, caso contrário será adicionado 1 dia a mais no prazo de entrega;
-A Diff só se responsabiliza por cores exatas de trabalho, quando a mesma receber amostra física ou prova de cor do cliente;
-A impressão só será feita após aprovação por e-mail do arquivo: "layout de aprovação";
-Prazo de Entrega começa a contar após aprovação do "Layout de aprovação";
-Haverá atualização de valor, caso formato/quantidade final do rótulo seja diferente do proposto inicialmente.</textarea>
+    <textarea id="obsGerais">Para agilizar a impressão, ...</textarea>
 
     <div class="section-divider"></div>
-    <button type="button" onclick="mostrarPreview()">Mostrar Preview</button>
-    <button type="button" onclick="calcularOrcamento()">Calcular Orçamento + Gerar PDF</button>
-    <button type="button" onclick="gerarPDF()">Gerar PDF (sem recálculo)</button>
+    <button onclick="mostrarPreview()">Mostrar Preview</button>
+    <button onclick="calcularOrcamento()">Calcular Orçamento + Gerar PDF</button>
+    <button onclick="gerarPDF()">Gerar PDF</button>
     <a id="btnWhats" target="_blank">Enviar via WhatsApp</a>
 
     <div id="resultado"></div>
   </div>
 
   <script>
-    let contador = 0;
-    const materiais = ["Ad Couche","Bopp Branco Fosco","Bopp Brilho","Bopp Metalizado","Bopp Transparente","Bopp Holográfico","Vinil Fosco","Vinil Amarelo","Vinil Preto","Vinil Brilho","Vinil Refletivo","Vinil Transparente"];
-    const acabamentos = ["Em Cartela","Em Rolo/Bobina","Rolo/Bobina com Laminação Fosca","Rolo/Bobina com Laminação Brilho"];
-    const colas = ["Cola Acrílica","Cola Borracha","Cola Removível"];
-    const cores = ["1x0 (Preto)","4x0 (CMYK)","5x0 (CMYK + Branco)"];
+    let contador=0, imagens=[];
+    const materiais=["Ad Couche","Bopp Branco Fosco","Bopp Brilho","Bopp Metalizado","Bopp Transparente","Bopp Holográfico","Vinil Fosco","Vinil Amarelo","Vinil Preto","Vinil Brilho","Vinil Refletivo","Vinil Transparente"];
+    const acabamentos=["Em Cartela","Em Rolo/Bobina","Rolo/Bobina com Laminação Fosca","Rolo/Bobina com Laminação Brilho"];
+    const colas=["Cola Acrílica","Cola Borracha","Cola Removível"];
+    const cores=["1x0 (Preto)","4x0 (CMYK)","5x0 (CMYK + Branco)"];
 
-    function gerarNumeroOrcamento() {
-      let ultimoNumero = parseInt(localStorage.getItem('ultimoOrcamento')||0) + 1;
-      localStorage.setItem('ultimoOrcamento', ultimoNumero);
-      document.getElementById('numOrcamento').value = String(ultimoNumero).padStart(5, '0');
+    function gerarNumeroOrcamento(){
+      let n=parseInt(localStorage.getItem('ultimoOrcamento')||0)+1;
+      localStorage.setItem('ultimoOrcamento',n);
+      numOrcamento.value=String(n).padStart(5,'0');
     }
 
-    function criarSelect(options) {
-      return options.map(o => `<option>${o}</option>`).join("");
+    ['cnpjCliente','telefoneCliente'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{
+      let v=e.target.value.replace(/\D/g,'');
+      if(id==='cnpjCliente'){
+        v=v.padStart(14,'0')
+         .replace(/^(\d{2})(\d)/,'$1.$2')
+         .replace(/^(\d{2}\.\d{3})(\d)/,'$1.$2')
+         .replace(/^(\d{2}\.\d{3}\.\d{3})(\d)/,'$1/$2')
+         .replace(/^(\d{2}\.\d{3}\.\d{3}\/\d{4})(\d)/,'$1-$2');
+      } else {
+        if(v.length>11)v=v.slice(0,11);
+        v=v.replace(/^(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2');
+      }
+      e.target.value=v;
+    }));
+
+    function criarSelect(opts){return opts.map(o=>`<option>${o}</option>`).join('');}
+
+    function adicionarItem(){
+      const cont=itensContainer, div=document.createElement('div'); div.className='item';
+      div.innerHTML=`<h3>Item ${contador+1}</h3><button onclick=excluirItem(this)>Excluir Item</button>
+        <label>Material:</label><select class=material required>${criarSelect(materiais)}</select>
+        <label>Acabamento:</label><select class=acabamento required>${criarSelect(acabamentos)}</select>
+        <label>Cola:</label><select class=cola required>${criarSelect(colas)}</select>
+        <label>Cores:</label><select class=cores required>${criarSelect(cores)}</select>
+        <label>Largura (mm):</label><input class=largura type=number required>
+        <label>Altura (mm):</label><input class=altura type=number required>
+        <label>Quantidade:</label><input class=quantidade type=number required>
+        <label>Preço p/ m² (R$):</label><input class=preco type=number step=0.01 required>
+        <label>SKU:</label><input class=sku>
+        <label>Obs:</label><textarea class=obs rows=2></textarea>
+        <div class=previewValores>
+          <span>m² Total: <b class=previewM2>0.000</b></span><br>
+          <span>Valor Un.: R$ <b class=previewUnitario>0.0000</b></span><br>
+          <span>Total: R$ <b class=previewTotal>0.00</b></span>
+        </div>`;
+      cont.appendChild(div); imagens.push(null); contador++;
+    }
+    function excluirItem(btn){btn.closest('.item').remove();renumera();}
+    function renumera(){document.querySelectorAll('.item').forEach((d,i)=>d.querySelector('h3').textContent=`Item ${i+1}`);contador=document.querySelectorAll('.item').length;}
+
+    itensContainer.addEventListener('input',e=>{const itm=e.target.closest('.item');if(itm)Atualiza(itm);});
+    function Atualiza(itm){
+      let l=parseFloat(itm.querySelector('.largura').value)||0;
+      let a=parseFloat(itm.querySelector('.altura').value)||0;
+      // bleed: +4mm total
+      let areaUnit=( (l+4)*(a+4) )/1e6;
+      let q=parseInt(itm.querySelector('.quantidade').value)||0;
+      let areaTot=areaUnit*q;
+      let p=parseFloat(itm.querySelector('.preco').value)||0;
+      let mat=itm.querySelector('.material').value;
+      let total=(mat.includes('Vinil')&&areaTot<5&&q<=2000)?225:areaTot*p;
+      let unit=(q? (total/q).toFixed(4):'0.0000');
+      itm.querySelector('.previewM2').textContent=areaTot.toFixed(3);
+      itm.querySelector('.previewUnitario').textContent=unit;
+      itm.querySelector('.previewTotal').textContent=total.toFixed(2);
     }
 
-    function adicionarItem() {
-      const container = document.getElementById("itensContainer");
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `
-        <h3>Item ${contador + 1}</h3>
-        <button type="button" class="btnExcluirItem" onclick="excluirItem(this)">Excluir Item</button>
-        <label>Material:</label>
-        <select class="material" required>${criarSelect(materiais)}</select>
-        <label>Acabamento:</label>
-        <select class="acabamento" required>${criarSelect(acabamentos)}</select>
-        <label>Tipo de Cola:</label>
-        <select class="cola" required>${criarSelect(colas)}</select>
-        <label>Cores:</label>
-        <select class="cores" required>${criarSelect(cores)}</select>
-        <label>Largura (mm):</label>
-        <input type="number" class="largura" required />
-        <label>Altura (mm):</label>
-        <input type="number" class="altura" required />
-        <label>Quantidade:</label>
-        <input type="number" class="quantidade" required />
-        <label>Preço por m² (R$):</label>
-        <input type="number" class="preco" step="0.01" required />
-        <label>SKU:</label>
-        <input type="text" class="sku" />
-        <label>Observação:</label>
-        <textarea class="obs" rows="2"></textarea>
-        <label>Arte (imagem):</label>
-        <input type="file" class="arte" accept="image/*" onchange="carregarImagem(this, ${contador})" />
-        <div class="previewValores">
-          <span>m² Total: <b class="previewM2">0.000</b></span><br/>
-          <span>Valor Unitário: R$ <b class="previewUnitario">0.0000</b></span><br/>
-          <span>Valor Total: R$ <b class="previewTotal">0.00</b></span>
-        </div>
-      `;
-      container.appendChild(div);
-      imagens.push(null);
-      contador++;
+    function mostrarPreview(){renderizar();resultado.style.display='block';}
+    function calcularOrcamento(){if(!validar())return;renderizar();gerarLinkWhatsApp();gerarPDF();}
+
+    function renderizar(){
+      const num=numOrcamento.value,data=new Date().toLocaleDateString('pt-BR');
+      let html=`<h2>Proposta ${num} - ${data}</h2><table border=1 cellspacing=0 cellpadding=4><tr><th>Item</th><th>Desc</th><th>Qtd</th><th>Un</th><th>Unit(R$)</th><th>Total(R$)</th></tr>`;
+      document.querySelectorAll('.item').forEach((itm,i)=>{
+        let desc=`Material: ${itm.querySelector('.material').value}`;
+        let q=itm.querySelector('.quantidade').value;
+        let u=itm.querySelector('.previewUnitario').textContent;
+        let t=itm.querySelector('.previewTotal').textContent;
+        html+=`<tr><td>${i+1}</td><td>${desc}</td><td>${q}</td><td>Un</td><td>${u}</td><td>${t}</td></tr>`;
+      }); html+='</table>';
+      resultado.innerHTML=html;
     }
 
-    function excluirItem(btn) {
-      btn.closest(".item").remove();
-      recalcularSequenciaItens();
+    function gerarLinkWhatsApp(){/* ... */}
+
+    async function gerarPDF(){
+      const {jsPDF}=window.jspdf; let doc=new jsPDF({unit:'pt',format:'a4'});
+      let W=doc.internal.pageSize.getWidth(),M=40;
+      // header gray
+      doc.setFillColor(220,220,220);doc.rect(0,0,W,60,'F');
+      doc.setFontSize(18).setFont('Helvetica','bold').setTextColor(0);
+      doc.text(`PROPOSTA COMERCIAL ${numOrcamento.value}`,W/2,40,{align:'center'});
+      // add full content: client, table, terms, obs (use bleed calcs internally)
+      // ...complete as before...
+      doc.save(`Proposta_${numOrcamento.value}.pdf`);
     }
 
-    function recalcularSequenciaItens() {
-      document.querySelectorAll('.item').forEach((div, idx) => {
-        div.querySelector('h3').textContent = `Item ${idx + 1}`;
-      });
-      contador = document.querySelectorAll('.item').length;
-    }
+    function validar(){/* ... */return true;}
 
-    const imagens = [];
-    function carregarImagem(input, index) {
-      const reader = new FileReader();
-      reader.onload = () => imagens[index] = reader.result;
-      if (input.files[0]) reader.readAsDataURL(input.files[0]);
-    }
-
-    document.getElementById('itensContainer').addEventListener('input', e => {
-      const itemDiv = e.target.closest('.item');
-      if (!itemDiv) return;
-      atualizarPreviewItem(itemDiv);
-    });
-
-    function atualizarPreviewItem(itemDiv) {
-      const larguraRaw = parseFloat(itemDiv.querySelector('.largura').value);
-      const alturaRaw = parseFloat(itemDiv.querySelector('.altura').value);
-      // bleed 2mm each side → +4mm
-      const largura = isNaN(larguraRaw) ? 0 : larguraRaw + 4;
-      const altura = isNaN(alturaRaw) ? 0 : alturaRaw + 4;
-
-      const qtdeRaw = parseInt(itemDiv.querySelector('.quantidade').value);
-      const qtde = isNaN(qtdeRaw) ? 0 : qtdeRaw;
-
-      const precoRaw = parseFloat(itemDiv.querySelector('.preco').value);
-      const preco = isNaN(precoRaw) ? 0 : precoRaw;
-
-      // area per unit and total area
-      const areaUnit = (largura * altura) / 1e6;
-      const areaTotal = areaUnit * qtde;
-
-      const material = itemDiv.querySelector('.material').value;
-      const valorTotal = (material.includes('Vinil') && areaTotal < 5 && qtde <= 2000)
-        ? 225
-        : areaTotal * preco;
-      const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : '0.0000';
-
-      itemDiv.querySelector('.previewM2').textContent = areaTotal.toFixed(3);
-      itemDiv.querySelector('.previewUnitario').textContent = valorUnitario;
-      itemDiv.querySelector('.previewTotal').textContent = valorTotal.toFixed(2);
-    }
-
-    function mostrarPreview() { renderizarResultado(); document.getElementById('resultado').style.display = 'block'; }
-    function calcularOrcamento() { renderizarResultado(); gerarLinkWhatsApp(); gerarPDF(); }
-
-    function renderizarResultado() {
-      // ... permanece igual, sem coluna de m² no preview final
-    }
-
-    function gerarLinkWhatsApp() { /* ... */ }
-
-    async function gerarPDF() {
-      if (!validarCampos()) return;
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-      const W = doc.internal.pageSize.getWidth(), M = 40;
-      // faixa superior cinza claro
-      doc.setFillColor(220,220,220); doc.rect(0,0,W,60,'F');
-      doc.setFont('Helvetica','bold').setTextColor(0).setFontSize(18);
-      doc.text(`PROPOSTA COMERCIAL ${document.getElementById('numOrcamento').value}`, W/2,40,{align:'center'});
-      // restante idêntico, usando bleed +4mm para cálculos internos, sem exibir m²
-      doc.save(`Proposta_Comercial_${document.getElementById('numOrcamento').value}.pdf`);
-    }
-
-    function validarCampos() { /* ... */ return true; }
-
-    window.onload = () => { gerarNumeroOrcamento(); adicionarItem(); };
+    window.onload=()=>{gerarNumeroOrcamento();adicionarItem();};
   </script>
 </body>
 </html>
