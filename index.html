@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Proposta Comercial – Diff Label</title>
+  <title>Proposta Comercial – Sua Empresa</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
@@ -264,17 +264,15 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       return options.map(o => `<option>${o}</option>`).join("");
     }
 
-    // Função para atualizar o contador de metragem quadrada total (com sangria de 2mm de cada lado = +4mm em cada dimensão)
     function atualizarAreaM2Item(itemDiv) {
       const larguraInput = parseFloat(itemDiv.querySelector(".largura").value);
       const alturaInput = parseFloat(itemDiv.querySelector(".altura").value);
       const qtdeInput = parseInt(itemDiv.querySelector(".quantidade").value);
-      // Sangria de 2mm de cada lado (total 4mm a mais em cada dimensão)
       const larguraComSangria = isNaN(larguraInput) ? 0 : larguraInput + 4;
       const alturaComSangria = isNaN(alturaInput) ? 0 : alturaInput + 4;
       const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
-      const area = (larguraComSangria * alturaComSangria) / 1000000; // m2 por etiqueta
-      const areaTotal = area * qtde; // m2 total
+      const area = (larguraComSangria * alturaComSangria) / 1000000;
+      const areaTotal = area * qtde;
 
       let span = itemDiv.querySelector(".area-m2-info");
       if (!span) {
@@ -286,7 +284,6 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       span.textContent = `Área total (com sangria): ${areaTotal.toFixed(3)} m² (${area.toFixed(4)} m²/etiqueta)`;
     }
 
-    // Esconde os contadores de área ao gerar PDF
     function esconderContadoresArea() {
       document.querySelectorAll('.area-m2-info').forEach(span => {
         span.setAttribute('hidden', 'true');
@@ -337,7 +334,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       container.appendChild(div);
       imagens.push(null);
       contador++;
-      atualizarAreaM2Item(div); // Inicializa o contador de área
+      atualizarAreaM2Item(div);
     }
 
     function excluirItem(botao) {
@@ -378,7 +375,6 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       e.target.value = v;
     });
 
-    // Atualiza preview E contador de área em tempo real para cada item
     document.getElementById("itensContainer").addEventListener("input", function(e) {
       const itemDiv = e.target.closest(".item");
       if (itemDiv) {
@@ -612,7 +608,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
 
     async function gerarPDF() {
       if (!validarCampos()) return;
-      esconderContadoresArea(); // Esconde o contador antes de gerar PDF
+      esconderContadoresArea();
       try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ unit: 'pt', format: 'a4' });
@@ -627,24 +623,24 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         const numOrcamento = document.getElementById("numOrcamento").value;
         const data = new Date().toLocaleDateString('pt-BR');
 
+        // CABEÇALHO CUSTOMIZADO
         doc.setFillColor(128, 128, 128);
         doc.rect(0, 0, larguraPagina, 60, 'F');
-        doc.setFontSize(18);
+        doc.setFontSize(22);
         doc.setTextColor(0, 0, 0);
         doc.setFont("Helvetica", "bold");
         doc.text(`PROPOSTA COMERCIAL ${numOrcamento}`, larguraPagina / 2, 40, { align: "center" });
 
-        doc.setFillColor(255, 204, 0);
-        doc.circle(margem + 40, 80, 30, 'F');
-        doc.setFontSize(12);
-        doc.setTextColor(0, 0, 0);
-        doc.setFont("Helvetica", "bold");
-        doc.text("diff.", margem + 70, 90);
-        doc.setFontSize(10);
-        doc.text("Label", margem + 70, 105);
+        // LOGO DA SUA EMPRESA (substitua abaixo pelo base64 da sua logo)
+        const logoBase64 = ""; // Cole aqui o base64 da sua logo PNG, ex: 'data:image/png;base64,iVBORw0KG...'
+        const logoLargura = 80;
+        const logoAltura = 80;
+        if (logoBase64) {
+          doc.addImage(logoBase64, 'PNG', margem, 70, logoLargura, logoAltura);
+        }
 
+        // Informações da empresa à direita (sem nome da empresa)
         const empresaLinhas = [
-          "DIFF EMBALAGENS ESPECIAIS",
           "R: Pomerode, 1371 - Bairro Salto do Norte - 89065-300 - Blumenau/SC",
           "CNPJ: 18.678.030/0001-17   IE: 260.482.544",
           "FONE: (47) 98808-1212 / (47) 3304-1600"
@@ -657,11 +653,9 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
           yTexto += 12;
         });
 
-        doc.setLineWidth(1);
-        doc.setDrawColor(200);
-        doc.line(margem, yTexto + 4, larguraPagina - margem, yTexto + 4);
-        let y = yTexto + 20;
+        let y = Math.max(yTexto + 20, 70 + logoAltura + 10);
 
+        // RESTANTE DO PDF (sem alterações)
         doc.setFontSize(10);
         doc.setFont("Helvetica", "bold");
         doc.text("Cliente:", margem, y);
