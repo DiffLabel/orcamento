@@ -39,6 +39,7 @@
     input.error, select.error {
       border-color: #e74c3c;
     }
+    /* Estilo chamativo e cor vermelha para a textarea de OBS gerais */
     #obsGerais {
       color: red;
       font-weight: bold;
@@ -85,10 +86,6 @@
       margin-top: 10px;
       font-size: 14px;
       color: #555;
-    }
-    .previewArea {
-      font-weight: bold;
-      color: #333;
     }
     button {
       margin-top: 15px;
@@ -143,6 +140,7 @@
 <body>
   <div class="wrapper">
     <h1>Proposta Comercial</h1>
+
     <label>Nº do Orçamento:</label>
     <input type="text" id="numOrcamento" readonly />
 
@@ -162,7 +160,6 @@
     <button type="button" onclick="adicionarItem()">Adicionar Item</button>
 
     <div class="section-divider"></div>
-
     <h2>Termos e Condições de Venda</h2>
     <label>Validade da Proposta:</label>
     <input type="text" id="validadeProposta" value="10 dias" />
@@ -291,8 +288,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         <input type="file" class="arte" accept="image/*" onchange="carregarImagem(this, ${contador})" />
         <div class="previewValores">
           <span>Valor Unitário: R$ <span class="previewUnitario">0.0000</span></span><br/>
-          <span>Valor Total: R$ <span class="previewTotal">0.00</span></span><br/>
-          <span>Área Total: <span class="previewArea">0.000</span> m²</span>
+          <span>Valor Total: R$ <span class="previewTotal">0.00</span></span>
         </div>
       `;
       container.appendChild(div);
@@ -320,6 +316,27 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       if (input.files[0]) reader.readAsDataURL(input.files[0]);
     }
 
+    // Formata CNPJ em tempo real: 00000000000000 → 00.000.000/0000-00
+    document.getElementById("cnpjCliente").addEventListener("input", function(e) {
+      let v = e.target.value.replace(/\D/g, "");
+      if (v.length > 14) v = v.slice(0, 14);
+      v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+      v = v.replace(/^(\d{2}\.\d{3})(\d)/, "$1.$2");
+      v = v.replace(/^(\d{2}\.\d{3}\.\d{3})(\d)/, "$1/$2");
+      v = v.replace(/^(\d{2}\.\d{3}\.\d{3}\/\d{4})(\d)/, "$1-$2");
+      e.target.value = v;
+    });
+
+    // Formata telefone em tempo real: 47988081212 → (47) 98808-1212
+    document.getElementById("telefoneCliente").addEventListener("input", function(e) {
+      let v = e.target.value.replace(/\D/g, "");
+      if (v.length > 11) v = v.slice(0, 11);
+      v = v.replace(/^(\d{2})(\d)/, "($1) $2");
+      v = v.replace(/(\d{5})(\d)/, "$1-$2");
+      e.target.value = v;
+    });
+
+    // Atualiza preview em tempo real para cada item
     document.getElementById("itensContainer").addEventListener("input", function(e) {
       const itemDiv = e.target.closest(".item");
       if (itemDiv) atualizarPreviewItem(itemDiv);
@@ -328,8 +345,8 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
     function atualizarPreviewItem(itemDiv) {
       const larguraInput = parseFloat(itemDiv.querySelector(".largura").value);
       const alturaInput = parseFloat(itemDiv.querySelector(".altura").value);
-      const largura = isNaN(larguraInput) ? 0 : larguraInput + 4;
-      const altura = isNaN(alturaInput) ? 0 : alturaInput + 4;
+      const largura = isNaN(larguraInput) ? 0 : larguraInput + 3;
+      const altura = isNaN(alturaInput) ? 0 : alturaInput + 3;
 
       const qtdeInput = parseInt(itemDiv.querySelector(".quantidade").value);
       const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
@@ -339,51 +356,418 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
 
       const area = (largura * altura) / 1000000;
       const areaTotal = area * qtde;
-
-      const valorTotal = areaTotal * preco;
+      const material = itemDiv.querySelector(".material").value;
+      const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
+        ? 225
+        : areaTotal * preco;
       const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : "0.0000";
 
       itemDiv.querySelector(".previewUnitario").textContent = valorUnitario;
       itemDiv.querySelector(".previewTotal").textContent = valorTotal.toFixed(2);
-      itemDiv.querySelector(".previewArea").textContent = areaTotal.toFixed(3);
     }
+
+    function validarCampos() {
+      let valido = true;
+      // Valida campos gerais
+      ["nomeCliente", "cnpjCliente", "telefoneCliente", "emailCliente", "validadeProposta", "contatoComercial"].forEach(id => {
+        const campo = document.getElementById(id);
+        if (!campo.value.trim()) {
+          campo.classList.add("error");
+          valido = false;
+        } else {
+          campo.classList.remove("error");
+        }
+      });
+      // Valida itens
+      document.querySelectorAll(".item").forEach(itemDiv => {
+        const camposObrig = itemDiv.querySelectorAll("select[required], input[required]");
+        camposObrig.forEach(campo => {
+          if (!campo.value || campo.value.trim() === "") {
+            campo.classList.add("error");
+            valido = false;
+          } else {
+            campo.classList.remove("error");
+          }
+        });
+      });
+      if (!valido) {
+        alert("Por favor, preencha todos os campos obrigatórios em vermelho.");
+      }
+      return valido;
+    }
+
+    function mostrarPreview() {
+      if (!validarCampos()) return;
+      renderizarResultado();
+      document.getElementById("resultado").style.display = "block";
+      document.getElementById("resultado").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function calcularOrcamento() {
+      if (!validarCampos()) return;
+      renderizarResultado();       // Atualiza a exibição
+      document.getElementById("resultado").style.display = "block";
+      gerarLinkWhatsApp();         // Exibe link de envio
+      gerarPDF();                  // Gera o PDF
+    }
+
+    function renderizarResultado() {
+      const nome = document.getElementById("nomeCliente").value || "-";
+      const cnpj = document.getElementById("cnpjCliente").value || "-";
+      const tel = document.getElementById("telefoneCliente").value || "-";
+      const email = document.getElementById("emailCliente").value || "-";
+      const numOrcamento = document.getElementById("numOrcamento").value;
+      const data = new Date().toLocaleDateString('pt-BR');
+      const itens = document.querySelectorAll(".item");
+      let totalGeral = 0;
+
+      let resultadoHTML = `
+        <div style="padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1);">
+        <h2 style="text-align:center; margin-bottom:10px;">Proposta Comercial ${numOrcamento}</h2>
+        <p style="font-size:14px; margin:4px 0;"><strong>Data:</strong> ${data}</p>
+        <p style="font-size:14px; margin:4px 0;">
+          <strong>Cliente:</strong> ${nome} | 
+          <strong>CNPJ:</strong> ${cnpj} | 
+          <strong>Telefone:</strong> ${tel} | 
+          <strong>E-mail:</strong> ${email}
+        </p>
+        <table style="width:100%; border-collapse: collapse; margin-top:10px;">
+          <thead style="background-color: #f0f0f0;">
+            <tr>
+              <th style="border: 1px solid #ccc; padding: 8px;">Item</th>
+              <th style="border: 1px solid #ccc; padding: 8px;">Descrição</th>
+              <th style="border: 1px solid #ccc; padding: 8px;">Qtd.</th>
+              <th style="border: 1px solid #ccc; padding: 8px;">Un.</th>
+              <th style="border: 1px solid #ccc; padding: 8px;">Preço Unit. (R$)</th>
+              <th style="border: 1px solid #ccc; padding: 8px;">Total (R$)</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      itens.forEach((item, i) => {
+        const material = item.querySelector(".material").value;
+        const acabamento = item.querySelector(".acabamento").value;
+        const cor = item.querySelector(".cores").value;
+        const larguraInput = parseFloat(item.querySelector(".largura").value);
+        const alturaInput = parseFloat(item.querySelector(".altura").value);
+        const largura = isNaN(larguraInput) ? 0 : larguraInput + 3;
+        const altura = isNaN(alturaInput) ? 0 : alturaInput + 3;
+        const qtdeInput = parseInt(item.querySelector(".quantidade").value);
+        const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
+        const precoInput = parseFloat(item.querySelector(".preco").value);
+        const preco = isNaN(precoInput) ? 0 : precoInput;
+        const sku = item.querySelector(".sku").value || "-";
+        const obs = item.querySelector(".obs").value;
+        const area = (largura * altura) / 1000000;
+        const areaTotal = area * qtde;
+        const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
+          ? 225
+          : areaTotal * preco;
+        const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : "0.0000";
+
+        totalGeral += valorTotal;
+
+        const descricao = `
+          <div style="font-size:13px;">
+            <strong>Remox ${i+1}</strong><br>
+            Material: ${material}<br>
+            Formato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm<br>
+            SKU: ${sku}<br>
+            Cores: ${cor}<br>
+            Acab: ${acabamento}
+          </div>
+        `;
+
+        resultadoHTML += `
+          <tr style="border-bottom:1px solid #e0e0e0;">
+            <td style="border: 1px solid #ccc; padding: 8px; text-align:center;">${i+1}</td>
+            <td style="border: 1px solid #ccc; padding: 8px; vertical-align:top;">
+              ${descricao}
+            </td>
+            <td style="border: 1px solid #ccc; padding: 8px; text-align:center;">${qtde}</td>
+            <td style="border: 1px solid #ccc; padding: 8px; text-align:center;">Un.</td>
+            <td style="border: 1px solid #ccc; padding: 8px; text-align:right;">R$ ${valorUnitario}</td>
+            <td style="border: 1px solid #ccc; padding: 8px; text-align:right;">R$ ${valorTotal.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      resultadoHTML += `
+          </tbody>
+        </table>
+        <div style="margin-top:10px; text-align:right; font-size:16px;">
+          <strong>TOTAL R$:</strong> R$ ${totalGeral.toFixed(2)}
+        </div>
+        <div style="background-color: #f0f0f0; padding: 10px; margin-top:20px; border-radius:4px;">
+          <strong>TERMOS E CONDIÇÕES DE VENDA</strong><br>
+          Validade da Proposta: ${document.getElementById("validadeProposta").value}<br>
+          Prazo de Entrega: ${document.getElementById("prazoEntrega").value}<br>
+          Condição de Pagamento: ${document.getElementById("condPagamento").value}<br>
+          Frete: ${document.getElementById("frete").value}<br>
+          Contato Comercial: ${document.getElementById("contatoComercial").value}
+        </div>
+        <div style="background-color: #fdecea; color: red; font-weight: bold; padding: 10px; margin-top: 10px; border-radius:4px; font-size:14px;">
+          OBS:<br>
+          ${document.getElementById("obsGerais").value.replace(/\n/g, "<br>")}
+        </div>
+        </div>
+      `;
+
+      document.getElementById("resultado").innerHTML = resultadoHTML;
+    }
+
+    function gerarLinkWhatsApp() {
+      const numOrcamento = document.getElementById("numOrcamento").value;
+      const nome = document.getElementById("nomeCliente").value;
+      const itens = document.querySelectorAll(".item");
+      let texto = `Proposta Comercial #${numOrcamento}%0ACliente: ${nome}%0A`;
+
+      itens.forEach((item, i) => {
+        const material = item.querySelector(".material").value;
+        const acabamento = item.querySelector(".acabamento").value;
+        const cor = item.querySelector(".cores").value;
+        const larguraInput = parseFloat(item.querySelector(".largura").value);
+        const alturaInput = parseFloat(item.querySelector(".altura").value);
+        const largura = isNaN(larguraInput) ? 0 : larguraInput + 3;
+        const altura = isNaN(alturaInput) ? 0 : alturaInput + 3;
+        const qtdeInput = parseInt(item.querySelector(".quantidade").value);
+        const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
+        const precoInput = parseFloat(item.querySelector(".preco").value);
+        const preco = isNaN(precoInput) ? 0 : precoInput;
+        const sku = item.querySelector(".sku").value || "-";
+        const obs = item.querySelector(".obs").value;
+        const area = (largura * altura) / 1000000;
+        const areaTotal = area * qtde;
+        const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
+          ? 225
+          : areaTotal * preco;
+        const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : "0.0000";
+
+        texto += `Item ${i+1}:%0A• Material: ${material}%0A• Formato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm%0A• SKU: ${sku}%0A• Cores: ${cor}%0A• Acab: ${acabamento}%0A• Qtde: ${qtde}%0A• Un.: Un%0A• Valor Unitário: R$ ${valorUnitario}%0A• Total: R$ ${valorTotal.toFixed(2)}`;
+        if (obs) texto += `%0A• Obs: ${obs}`;
+        texto += `%0A%0A`;
+      });
+
+      const validade = document.getElementById("validadeProposta").value;
+      const prazoEntrega = document.getElementById("prazoEntrega").value;
+      const condPagamento = document.getElementById("condPagamento").value;
+      const frete = document.getElementById("frete").value;
+      const contato = document.getElementById("contatoComercial").value;
+      const obsGerais = document.getElementById("obsGerais").value.split("\n").join("%0A");
+
+      texto += `TERMOS E CONDIÇÕES DE VENDA:%0A• Validade da Proposta: ${validade}%0A• Prazo de Entrega: ${prazoEntrega}%0A• Condição de Pagamento: ${condPagamento}%0A• Frete: ${frete}%0A• Contato Comercial: ${contato}%0A%0AOBS:%0A${encodeURI(obsGerais)}%0A`;
+
+      texto = encodeURI(texto.trim());
+      const url = `https://wa.me/?text=${texto}`;
+      const btn = document.getElementById("btnWhats");
+      btn.href = url;
+      btn.style.display = "block";
+    }
+
     async function gerarPDF() {
+      if (!validarCampos()) return;
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: 'pt', format: 'a4' });
       const larguraPagina = doc.internal.pageSize.getWidth();
       const margem = 40;
       const larguraUtil = larguraPagina - margem * 2;
 
-      // Cabeçalho cinza claro
-      doc.setFillColor(220, 220, 220);
-      doc.rect(0, 0, larguraPagina, 60, 'F');
+      // Resgata dados do cliente
+      const nome = document.getElementById("nomeCliente").value || "-";
+      const cnpj = document.getElementById("cnpjCliente").value || "-";
+      const tel = document.getElementById("telefoneCliente").value || "-";
+      const email = document.getElementById("emailCliente").value || "-";
+      const numOrcamento = document.getElementById("numOrcamento").value;
+      const data = new Date().toLocaleDateString('pt-BR');
+
+      // ------------------------------------------------------------
+      // Cabeçalho aprimorado
+      // ------------------------------------------------------------
+      doc.setFillColor(128, 128, 128);
+      doc.rect(0, 0, larguraPagina, 60, 'F'); // faixa cinza
       doc.setFontSize(18);
       doc.setTextColor(0, 0, 0);
       doc.setFont("Helvetica", "bold");
-      doc.text(`PROPOSTA COMERCIAL ${document.getElementById("numOrcamento").value}`, larguraPagina / 2, 40, { align: "center" });
+      doc.text(`PROPOSTA COMERCIAL ${numOrcamento}`, larguraPagina / 2, 40, { align: "center" });
 
-      let y = 100;
-      document.querySelectorAll(".item").forEach((item, i) => {
-        doc.setFontSize(10);
-        doc.text(`Item ${i + 1}:`, margem, y);
-        y += 12;
+      // Logo (círculo amarelo ou imagem)
+      doc.setFillColor(255, 204, 0);
+      doc.circle(margem + 40, 80, 30, 'F');
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont("Helvetica", "bold");
+      doc.text("diff.", margem + 70, 90);
+      doc.setFontSize(10);
+      doc.text("Label", margem + 70, 105);
 
-        const larguraInput = parseFloat(item.querySelector(".largura").value);
-        const alturaInput = parseFloat(item.querySelector(".altura").value);
-        const largura = isNaN(larguraInput) ? 0 : larguraInput + 4;
-        const altura = isNaN(alturaInput) ? 0 : alturaInput + 4;
-        const qtde = parseInt(item.querySelector(".quantidade").value);
-        const preco = parseFloat(item.querySelector(".preco").value);
-        const areaTotal = ((largura * altura) / 1000000) * qtde;
-        const valorTotal = areaTotal * preco;
-
-        doc.text(`Largura com sangria: ${largura}mm, Altura com sangria: ${altura}mm`, margem, y);
-        y += 12;
-        doc.text(`Área total: ${areaTotal.toFixed(3)} m², Quantidade: ${qtde}, Valor Total: R$ ${valorTotal.toFixed(2)}`, margem, y);
-        y += 20;
+      // Informações da empresa à direita
+      const empresaLinhas = [
+        "DIFF EMBALAGENS ESPECIAIS",
+        "R: Pomerode, 1371 - Bairro Salto do Norte - 89065-300 - Blumenau/SC",
+        "CNPJ: 18.678.030/0001-17   IE: 260.482.544",
+        "FONE: (47) 98808-1212 / (47) 3304-1600"
+      ];
+      doc.setFontSize(10);
+      doc.setFont("Helvetica", "normal");
+      let yTexto = 60;
+      empresaLinhas.forEach(linha => {
+        doc.text(linha, larguraPagina - margem, yTexto, { align: "right" });
+        yTexto += 12;
       });
 
-      // Termos e Condições com fundo cinza médio
+      // Linha separadora abaixo do cabeçalho
+      doc.setLineWidth(1);
+      doc.setDrawColor(200);
+      doc.line(margem, yTexto + 4, larguraPagina - margem, yTexto + 4);
+      let y = yTexto + 20;
+
+      // ------------------------------------------------------------
+      // Dados do cliente
+      // ------------------------------------------------------------
+      doc.setFontSize(10);
+      doc.setFont("Helvetica", "bold");
+      doc.text("Cliente:", margem, y);
+      doc.setFont("Helvetica", "normal");
+      doc.text(nome, margem + 50, y);
+      y += 14;
+      doc.setFont("Helvetica", "bold");
+      doc.text("CNPJ:", margem, y);
+      doc.setFont("Helvetica", "normal");
+      doc.text(cnpj, margem + 30, y);
+      y += 14;
+      doc.setFont("Helvetica", "bold");
+      doc.text("Telefone:", margem, y);
+      doc.setFont("Helvetica", "normal");
+      doc.text(tel, margem + 60, y);
+      y += 14;
+      doc.setFont("Helvetica", "bold");
+      doc.text("E-mail:", margem, y);
+      doc.setFont("Helvetica", "normal");
+      doc.text(email, margem + 40, y);
+      y += 20;
+
+      // ------------------------------------------------------------
+      // Tabela de Itens com estilo aprimorado
+      // ------------------------------------------------------------
+      const colWidths = [
+        30,
+        larguraUtil * 0.45,
+        40,
+        30,
+        100,
+        80
+      ];
+      let x = margem;
+
+      // Cabeçalho da tabela
+      doc.setFillColor(240, 240, 240);
+      doc.setDrawColor(180);
+      doc.setLineWidth(0.5);
+      doc.setFontSize(9);
+      doc.setFont("Helvetica", "bold");
+
+      // Retângulos de cabeçalho
+      doc.rect(x, y, colWidths[0], 22, "F");
+      doc.rect(x + colWidths[0], y, colWidths[1], 22, "F");
+      doc.rect(x + colWidths[0] + colWidths[1], y, colWidths[2], 22, "F");
+      doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2], y, colWidths[3], 22, "F");
+      doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3], y, colWidths[4], 22, "F");
+      doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4], y, colWidths[5], 22, "F");
+
+      // Texto do cabeçalho
+      doc.text("Item", x + 5, y + 15);
+      doc.text("Descrição", x + colWidths[0] + 5, y + 15);
+      doc.text("Qtd.", x + colWidths[0] + colWidths[1] + 5, y + 15);
+      doc.text("Un.", x + colWidths[0] + colWidths[1] + colWidths[2] + 5, y + 15);
+      doc.text("Preço Unit. (R$)", x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + 5, y + 15);
+      doc.text("Total (R$)", x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] + 5, y + 15);
+
+      y += 24;
+      doc.setFont("Helvetica", "normal");
+      let totalGeral = 0;
+
+      document.querySelectorAll(".item").forEach((item, i) => {
+        const material = item.querySelector(".material").value;
+        const acabamento = item.querySelector(".acabamento").value;
+        const cor = item.querySelector(".cores").value;
+        const larguraInput = parseFloat(item.querySelector(".largura").value);
+        const alturaInput = parseFloat(item.querySelector(".altura").value);
+        const largura = isNaN(larguraInput) ? 0 : larguraInput + 3;
+        const altura = isNaN(alturaInput) ? 0 : alturaInput + 3;
+        const qtdeInput = parseInt(item.querySelector(".quantidade").value);
+        const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
+        const precoInput = parseFloat(item.querySelector(".preco").value);
+        const preco = isNaN(precoInput) ? 0 : precoInput;
+        const sku = item.querySelector(".sku").value || "-";
+        const obs = item.querySelector(".obs").value;
+        const area = (largura * altura) / 1000000;
+        const areaTotal = area * qtde;
+        const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
+          ? 225
+          : areaTotal * preco;
+        const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : "0.0000";
+
+        totalGeral += valorTotal;
+
+        // Determina quantas linhas a descrição vai ocupar
+        const descText = `Remox ${i+1}\nMaterial: ${material}\nFormato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm\nSKU: ${sku}\nCores: ${cor}\nAcab: ${acabamento}`;
+        const descLines = doc.splitTextToSize(descText, colWidths[1] - 10);
+        const lineHeight = 12;
+        const rowHeight = descLines.length * lineHeight + 10;
+
+        // Nova página se necessário
+        if (y + rowHeight > 750) {
+          doc.addPage();
+          y = 40;
+        }
+
+        // Alternar cor de fundo entre linhas
+        if (i % 2 === 0) {
+          doc.setFillColor(250, 250, 250);
+          doc.rect(margem, y - 2, larguraUtil, rowHeight, 'F');
+        }
+
+        // Texto das células
+        doc.setTextColor(0, 0, 0);
+        doc.setFont("Helvetica", "bold");
+        doc.text(String(i+1), x + 5, y + 12);
+        doc.setFont("Helvetica", "normal");
+        doc.text(descLines, x + colWidths[0] + 5, y + 12);
+        doc.text(String(qtde), x + colWidths[0] + colWidths[1] + 15, y + 12);
+        doc.text("Un.", x + colWidths[0] + colWidths[1] + colWidths[2] + 5, y + 12);
+        doc.text(`R$ ${valorUnitario}`, x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + 5, y + 12);
+        doc.text(`R$ ${valorTotal.toFixed(2)}`, x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] + 5, y + 12);
+
+        // Bordas das células
+        doc.setDrawColor(200);
+        doc.setLineWidth(0.5);
+        doc.rect(x, y - 2, colWidths[0], rowHeight, "S");
+        doc.rect(x + colWidths[0], y - 2, colWidths[1], rowHeight, "S");
+        doc.rect(x + colWidths[0] + colWidths[1], y - 2, colWidths[2], rowHeight, "S");
+        doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2], y - 2, colWidths[3], rowHeight, "S");
+        doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3], y - 2, colWidths[4], rowHeight, "S");
+        doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4], y - 2, colWidths[5], rowHeight, "S");
+
+        y += rowHeight + 4;
+      });
+
+      // Linha de total geral
+      if (y > 750) {
+        doc.addPage();
+        y = 40;
+      }
+      doc.setFont("Helvetica", "bold");
+      doc.setFontSize(12);
+      doc.setDrawColor(180);
+      doc.line(margem, y, larguraPagina - margem, y);
+      y += 12;
+      doc.text(`TOTAL GERAL: R$ ${totalGeral.toFixed(2)}`, margem + larguraUtil - 150, y, { align: "left" });
+      y += 20;
+
+      // ------------------------------------------------------------
+      // Termos e Condições & OBS
+      // ------------------------------------------------------------
       if (y > 750) {
         doc.addPage();
         y = 40;
@@ -392,25 +776,53 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       doc.line(margem, y, larguraPagina - margem, y);
       y += 12;
 
-      doc.setFillColor(200, 200, 200);
-      const alturaTermos = 80;
-      doc.rect(margem, y, larguraUtil, alturaTermos, 'F');
-
       doc.setFont("Helvetica", "bold");
       doc.setFontSize(12);
-      doc.text("TERMOS E CONDIÇÕES DE VENDA", margem + 10, y + 16);
+      doc.text("TERMOS E CONDIÇÕES DE VENDA", margem, y);
+      y += 16;
 
       doc.setFont("Helvetica", "normal");
       doc.setFontSize(10);
-      doc.text(`Validade da Proposta: ${document.getElementById("validadeProposta").value}`, margem + 10, y + 32);
-      doc.text(`Prazo de Entrega: ${document.getElementById("prazoEntrega").value}`, margem + 10, y + 44);
-      doc.text(`Condição de Pagamento: ${document.getElementById("condPagamento").value}`, margem + 10, y + 56);
-      doc.text(`Frete: ${document.getElementById("frete").value}`, margem + 10, y + 68);
-      doc.text(`Contato Comercial: ${document.getElementById("contatoComercial").value}`, margem + 10, y + 80);
+      doc.text(`Validade da Proposta: ${document.getElementById("validadeProposta").value}`, margem, y); y += 12;
+      doc.text(`Prazo de Entrega: ${document.getElementById("prazoEntrega").value}`, margem, y); y += 12;
+      doc.text(`Condição de Pagamento: ${document.getElementById("condPagamento").value}`, margem, y); y += 12;
+      doc.text(`Frete: ${document.getElementById("frete").value}`, margem, y); y += 12;
+      doc.text(`Contato Comercial: ${document.getElementById("contatoComercial").value}`, margem, y); y += 20;
 
-      y += alturaTermos + 12;
+      if (y > 750) {
+        doc.addPage();
+        y = 40;
+      }
+      doc.setDrawColor(180);
+      doc.line(margem, y, larguraPagina - margem, y);
+      y += 12;
 
-      doc.save(`Proposta_Comercial_${document.getElementById("numOrcamento").value}.pdf`);
+      doc.setFont("Helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(255, 0, 0);
+      doc.text("OBS:", margem, y); y += 14;
+
+      doc.setFont("Helvetica", "normal");
+      doc.setFontSize(10);
+      const obsWidth = larguraUtil * 0.9;
+      document.getElementById("obsGerais").value.split("\n").forEach(line => {
+        if (y > 750) {
+          doc.addPage();
+          y = 40;
+        }
+        const wrapped = doc.splitTextToSize(line, obsWidth);
+        doc.text(wrapped, margem + 5, y);
+        y += wrapped.length * 12;
+      });
+
+      if (y > 750) {
+        doc.addPage();
+        y = 40;
+      }
+      doc.setDrawColor(180);
+      doc.line(margem, y + 10, larguraPagina - margem, y + 10);
+
+      doc.save(`Proposta_Comercial_${numOrcamento}.pdf`);
     }
 
     window.onload = () => {
