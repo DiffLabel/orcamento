@@ -150,7 +150,6 @@
 <body>
   <div class="wrapper">
     <h1>Proposta Comercial</h1>
-
     <label>Nº do Orçamento:</label>
     <input type="text" id="numOrcamento" readonly />
 
@@ -218,10 +217,8 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
     <button type="button" onclick="calcularOrcamento()">Calcular Orçamento + Gerar PDF</button>
     <button type="button" onclick="gerarPDF()">Gerar PDF (sem recálculo)</button>
     <a id="btnWhats" target="_blank">Enviar via WhatsApp</a>
-
     <div id="resultado"></div>
   </div>
-
   <script>
     let contador = 0;
     const imagens = [];
@@ -308,6 +305,8 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       div.innerHTML = `
         <h3>Item ${contador + 1}</h3>
         <button type="button" class="btnExcluirItem" onclick="excluirItem(this)">Excluir Item</button>
+        <label>Identificação do Cliente:</label>
+        <input type="text" class="identificacaoCliente" placeholder="Ex: código ou nome do produto do cliente" />
         <label>Material:</label>
         <select class="material" required>${criarSelect(materiais)}</select>
         <label>Acabamento:</label>
@@ -490,6 +489,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       `;
 
       itens.forEach((item, i) => {
+        const identificacao = item.querySelector(".identificacaoCliente").value.trim() || `Item ${i+1}`;
         const material = item.querySelector(".material").value;
         const acabamento = item.querySelector(".acabamento").value;
         const cor = item.querySelector(".cores").value;
@@ -514,7 +514,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
 
         const descricao = `
           <div style="font-size:13px;">
-            <strong>Remox ${i+1}</strong><br>
+            <strong>${identificacao}</strong><br>
             Material: ${material}<br>
             Formato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm<br>
             SKU: ${sku}<br>
@@ -568,6 +568,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       let texto = `Proposta Comercial #${numOrcamento}%0ACliente: ${nome}%0A`;
 
       itens.forEach((item, i) => {
+        const identificacao = item.querySelector(".identificacaoCliente").value.trim() || `Item ${i+1}`;
         const material = item.querySelector(".material").value;
         const acabamento = item.querySelector(".acabamento").value;
         const cor = item.querySelector(".cores").value;
@@ -588,7 +589,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
           : areaTotal * preco;
         const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : "0.0000";
 
-        texto += `Item ${i+1}:%0A• Material: ${material}%0A• Formato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm%0A• SKU: ${sku}%0A• Cores: ${cor}%0A• Acab: ${acabamento}%0A• Qtde: ${qtde}%0A• Un.: Un%0A• Valor Unitário: R$ ${valorUnitario}%0A• Total: R$ ${valorTotal.toFixed(2)}`;
+        texto += `${identificacao}:%0A• Material: ${material}%0A• Formato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm%0A• SKU: ${sku}%0A• Cores: ${cor}%0A• Acab: ${acabamento}%0A• Qtde: ${qtde}%0A• Un.: Un%0A• Valor Unitário: R$ ${valorUnitario}%0A• Total: R$ ${valorTotal.toFixed(2)}`;
         if (obs) texto += `%0A• Obs: ${obs}`;
         texto += `%0A%0A`;
       });
@@ -718,6 +719,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         let totalGeral = 0;
 
         document.querySelectorAll(".item").forEach((item, i) => {
+          const identificacao = item.querySelector(".identificacaoCliente").value.trim() || `Item ${i+1}`;
           const material = item.querySelector(".material").value;
           const acabamento = item.querySelector(".acabamento").value;
           const cor = item.querySelector(".cores").value;
@@ -740,7 +742,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
 
           totalGeral += valorTotal;
 
-          const descText = `Remox ${i+1}\nMaterial: ${material}\nFormato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm\nSKU: ${sku}\nCores: ${cor}\nAcab: ${acabamento}`;
+          const descText = `${identificacao}\nMaterial: ${material}\nFormato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm\nSKU: ${sku}\nCores: ${cor}\nAcab: ${acabamento}`;
           const descLines = doc.splitTextToSize(descText, colWidths[1] - 10);
           const lineHeight = 12;
           const rowHeight = descLines.length * lineHeight + 10;
