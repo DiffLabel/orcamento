@@ -383,29 +383,29 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       }
     });
 
-    function atualizarPreviewItem(itemDiv) {
-      const larguraInput = parseFloat(itemDiv.querySelector(".largura").value);
-      const alturaInput = parseFloat(itemDiv.querySelector(".altura").value);
-      const largura = isNaN(larguraInput) ? 0 : larguraInput + 4;
-      const altura = isNaN(alturaInput) ? 0 : alturaInput + 4;
+function atualizarPreviewItem(itemDiv) {
+  const larguraInput = parseFloat(itemDiv.querySelector(".largura").value);
+  const alturaInput = parseFloat(itemDiv.querySelector(".altura").value);
+  const largura = isNaN(larguraInput) ? 0 : larguraInput + 4;
+  const altura = isNaN(alturaInput) ? 0 : alturaInput + 4;
 
-      const qtdeInput = parseInt(itemDiv.querySelector(".quantidade").value);
-      const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
+  const qtdeInput = parseInt(itemDiv.querySelector(".quantidade").value);
+  const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
 
-      const precoInput = parseFloat(itemDiv.querySelector(".preco").value);
-      const preco = isNaN(precoInput) ? 0 : precoInput;
+  const precoInput = parseFloat(itemDiv.querySelector(".preco").value);
+  const preco = isNaN(precoInput) ? 0 : precoInput;
 
-      const area = (largura * altura) / 1000000;
-      const areaTotal = area * qtde;
-      const material = itemDiv.querySelector(".material").value;
-      const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
-        ? 225
-        : areaTotal * preco;
-      const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : "0.0000";
+  const area = (largura * altura) / 1000000;
+  const areaTotal = area * qtde;
+  const material = itemDiv.querySelector(".material").value;
+  const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
+    ? 225
+    : areaTotal * preco;
+  const valorUnitario = qtde > 0 ? (valorTotal / qtde) : 0;
 
-      itemDiv.querySelector(".previewUnitario").textContent = valorUnitario;
-      itemDiv.querySelector(".previewTotal").textContent = valorTotal.toFixed(2);
-    }
+  itemDiv.querySelector(".previewUnitario").textContent = valorUnitario.toFixed(4);
+  itemDiv.querySelector(".previewTotal").textContent = valorTotal.toFixed(2);
+}
 
     function validarCampos() {
       let valido = true;
