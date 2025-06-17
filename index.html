@@ -156,7 +156,7 @@
     <label>Nome do Cliente:</label>
     <input type="text" id="nomeCliente" required />
 
-    <label>CNPJ:</label>
+    <label>CNPJ/CPF:</label>
     <input type="text" id="cnpjCliente" placeholder="Somente números" />
 
     <label>Telefone:</label>
@@ -357,15 +357,25 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
       if (input.files[0]) reader.readAsDataURL(input.files[0]);
     }
 
-    document.getElementById("cnpjCliente").addEventListener("input", function(e) {
-      let v = e.target.value.replace(/\D/g, "");
-      if (v.length > 14) v = v.slice(0, 14);
-      v = v.replace(/^(\d{2})(\d)/, "$1.$2");
-      v = v.replace(/^(\d{2}\.\d{3})(\d)/, "$1.$2");
-      v = v.replace(/^(\d{2}\.\d{3}\.\d{3})(\d)/, "$1/$2");
-      v = v.replace(/^(\d{2}\.\d{3}\.\d{3}\/\d{4})(\d)/, "$1-$2");
-      e.target.value = v;
-    });
+  document.getElementById("cnpjCliente").addEventListener("input", function(e) {
+  let v = e.target.value.replace(/\D/g, "");
+  if (v.length <= 11) {
+    // Formata como CPF: 000.000.000-00
+    v = v.replace(/^(\d{3})(\d)/, "$1.$2");
+    v = v.replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3");
+    v = v.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+    v = v.slice(0, 14); // Limita o tamanho
+  } else {
+    // Formata como CNPJ: 00.000.000/0000-00
+    v = v.slice(0,14);
+    v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+    v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+    v = v.replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3/$4");
+    v = v.replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, "$1.$2.$3/$4-$5");
+    v = v.slice(0, 18); // Limita o tamanho
+  }
+  e.target.value = v;
+});
 
     document.getElementById("telefoneCliente").addEventListener("input", function(e) {
       let v = e.target.value.replace(/\D/g, "");
