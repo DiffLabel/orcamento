@@ -661,27 +661,39 @@ empresaLinhas.forEach(linha => {
         let y = Math.max(yTexto + 20, 70 + logoAltura + 10);
 
         // RESTANTE DO PDF (sem alterações)
-        doc.setFontSize(10);
-        doc.setFont("Helvetica", "bold");
-        doc.text("Cliente:", margem, y);
-        doc.setFont("Helvetica", "normal");
-        doc.text(nome, margem + 50, y);
-        y += 14;
-        doc.setFont("Helvetica", "bold");
-        doc.text("CNPJ:", margem, y);
-        doc.setFont("Helvetica", "normal");
-        doc.text(cnpj, margem + 30, y);
-        y += 14;
-        doc.setFont("Helvetica", "bold");
-        doc.text("Telefone:", margem, y);
-        doc.setFont("Helvetica", "normal");
-        doc.text(tel, margem + 60, y);
-        y += 14;
-        doc.setFont("Helvetica", "bold");
-        doc.text("E-mail:", margem, y);
-        doc.setFont("Helvetica", "normal");
-        doc.text(email, margem + 40, y);
-        y += 20;
+       const xLabel = margem;       // coluna dos rótulos
+const xValue = margem + 100; // coluna dos valores (ajuste se quiser mais ou menos espaço)
+let yDados = y;              // y já calculado no seu código
+const espacamento = 22;      // espaço entre linhas/dados
+
+doc.setFontSize(14);
+
+doc.setFont("Helvetica", "bold");
+doc.text("Cliente:", xLabel, yDados);
+doc.setFont("Helvetica", "normal");
+doc.text(nome, xValue, yDados);
+yDados += espacamento;
+
+doc.setFont("Helvetica", "bold");
+doc.text("CNPJ:", xLabel, yDados);
+doc.setFont("Helvetica", "normal");
+doc.text(cnpj, xValue, yDados);
+yDados += espacamento;
+
+doc.setFont("Helvetica", "bold");
+doc.text("Telefone:", xLabel, yDados);
+doc.setFont("Helvetica", "normal");
+doc.text(tel, xValue, yDados);
+yDados += espacamento;
+
+doc.setFont("Helvetica", "bold");
+doc.text("E-mail:", xLabel, yDados);
+doc.setFont("Helvetica", "normal");
+doc.text(email, xValue, yDados);
+yDados += espacamento + 8;
+
+// ATUALIZE O "y" para continuar a renderização após os dados:
+y = yDados;
 
         const colWidths = [
           30,
