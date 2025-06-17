@@ -641,7 +641,7 @@ doc.text(`PROPOSTA COMERCIAL ${numOrcamento}`, larguraPagina / 2, 38, { align: "
 const logoAltura = 50;
 const logoY = (alturaFaixa - logoAltura) / 2;
 if (logoBase64) {
-  doc.addImage(logoBase64, 'PNG', margem, logoY, logoLargura, logoAltura);
+  doc.addImage(logoBase64, 'PNG', 10, logoY, logoLargura, logoAltura);
 }
 
 // Informações da empresa à direita, logo abaixo da faixa cinza
