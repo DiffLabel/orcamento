@@ -473,10 +473,10 @@ function atualizarPreviewItem(itemDiv) {
       let resultadoHTML = `
         <div style="padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1);">
         <h2 style="text-align:center; margin-bottom:10px;">Proposta Comercial ${numOrcamento}</h2>
-        <p style="font-size:14px; margin:4px 0;"><strong>Data:</strong> ${data}</p>
-        <p style="font-size:14px; margin:4px 0;">
+        <p style="font-size:11px; margin:4px 0;"><strong>Data:</strong> ${data}</p>
+        <p style="font-size:11px; margin:4px 0;">
           <strong>Cliente:</strong> ${nome} | 
-          <strong>CNPJ:</strong> ${cnpj} | 
+          <strong>CNPJ/CPF:</strong> ${cnpj} | 
           <strong>Telefone:</strong> ${tel} | 
           <strong>E-mail:</strong> ${email}
         </p>
@@ -616,22 +616,61 @@ function atualizarPreviewItem(itemDiv) {
       btn.style.display = "block";
     }
 
-    async function gerarPDF() {
-      if (!validarCampos()) return;
-      esconderContadoresArea();
-      try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-        const larguraPagina = doc.internal.pageSize.getWidth();
-        const margem = 40;
-        const larguraUtil = larguraPagina - margem * 2;
+  async function gerarPDF() {
+  if (!validarCampos()) return;
+  esconderContadoresArea();
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const larguraPagina = doc.internal.pageSize.getWidth();
+    const margem = 40;
+    const larguraUtil = larguraPagina - margem * 2;
 
-        const nome = document.getElementById("nomeCliente").value || "-";
-        const cnpj = document.getElementById("cnpjCliente").value || "-";
-        const tel = document.getElementById("telefoneCliente").value || "-";
-        const email = document.getElementById("emailCliente").value || "-";
-        const numOrcamento = document.getElementById("numOrcamento").value;
-        const data = new Date().toLocaleDateString('pt-BR');
+    const nome = document.getElementById("nomeCliente").value || "-";
+    const cnpj = document.getElementById("cnpjCliente").value || "-";
+    const tel = document.getElementById("telefoneCliente").value || "-";
+    const email = document.getElementById("emailCliente").value || "-";
+    const numOrcamento = document.getElementById("numOrcamento").value;
+    const data = new Date().toLocaleDateString('pt-BR');
+
+    // Definição dos X para as colunas
+    const xLabel = margem;
+    const xValue = margem + 60; // Diminua esse valor para aproximar mais
+
+    // Y inicial e espaçamento vertical
+    let yDados = 100;
+    const espacamento = 22;
+
+    // Impressão dos dados do cliente
+    doc.setFont("Helvetica", "bold");
+    doc.text("Cliente:", xLabel, yDados);
+    doc.setFont("Helvetica", "normal");
+    doc.text(nome, xValue, yDados);
+    yDados += espacamento;
+
+    doc.setFont("Helvetica", "bold");
+    doc.text("CNPJ:", xLabel, yDados);
+    doc.setFont("Helvetica", "normal");
+    doc.text(cnpj, xValue, yDados);
+    yDados += espacamento;
+
+    doc.setFont("Helvetica", "bold");
+    doc.text("Telefone:", xLabel, yDados);
+    doc.setFont("Helvetica", "normal");
+    doc.text(tel, xValue, yDados);
+    yDados += espacamento;
+
+    doc.setFont("Helvetica", "bold");
+    doc.text("E-mail:", xLabel, yDados);
+    doc.setFont("Helvetica", "normal");
+    doc.text(email, xValue, yDados);
+    yDados += espacamento;
+
+    // ... o resto do seu código de geração do PDF ...
+  } catch (e) {
+    alert("Erro ao gerar PDF: " + e.message);
+  }
+}
 
         // CABEÇALHO CUSTOMIZADO
 const alturaFaixa = 60;
