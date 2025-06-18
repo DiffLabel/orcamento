@@ -629,10 +629,9 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         const tel = document.getElementById("telefoneCliente").value || "-";
         const email = document.getElementById("emailCliente").value || "-";
         const numOrcamento = document.getElementById("numOrcamento").value;
-        const data = new Date().toLocaleDateString('pt-BR');
 
         // --- FAIXA CINZA NO TOPO ---
-        const alturaFaixa = 85;
+        const alturaFaixa = 90;
         doc.setFillColor(128, 128, 128);
         doc.rect(0, 0, larguraPagina, alturaFaixa, 'F');
 
@@ -641,58 +640,53 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         const logoLargura = 90;
         const logoAltura = 50;
         if (logoBase64) {
-          doc.addImage(logoBase64, 'PNG', margem, 5, logoLargura, logoAltura);
+          doc.addImage(logoBase64, 'PNG', margem, 6, logoLargura, logoAltura);
         }
 
-        // --- TÍTULO CENTRALIZADO NA FAIXA CINZA ---
-        doc.setFontSize(32);
+        // --- TÍTULO CENTRALIZADO NA FAIXA CINZA, MENOR E MAIS BAIXO ---
+        doc.setFontSize(34);
         doc.setFont("Helvetica", "bold");
         doc.setTextColor(0, 0, 0);
-        doc.text(`PROPOSTA COMERCIAL ${numOrcamento}`, larguraPagina / 2, 50, { align: "center" });
+        doc.text(`PROPOSTA COMERCIAL ${numOrcamento}`, larguraPagina / 2 + 20, 58, { align: "center" });
 
-        // --- INFORMAÇÕES DA DIFF ABAIXO DA FAIXA CINZA ---
-        doc.setFontSize(13);
+        // --- INFORMAÇÕES DA DIFF ABAIXO DA FAIXA CINZA, FONTE SIZE 11 ---
+        doc.setFontSize(11);
         doc.setFont("Helvetica", "normal");
         doc.setTextColor(0, 0, 0);
 
-        let yInfo = alturaFaixa + 10;
+        let yInfo = alturaFaixa + 12;
         doc.text("R: Pomerode, 1371 - Bairro Salto do Norte - 89065-300 - Blumenau/SC", larguraPagina - margem, yInfo, { align: "right" });
-        yInfo += 16;
+        yInfo += 14;
         doc.text("CNPJ: 18.678.030/0001-17    IE: 260.482.544", larguraPagina - margem, yInfo, { align: "right" });
-        yInfo += 16;
+        yInfo += 14;
         doc.text("FONE: (47) 98808-1212 / (47) 3304-1600", larguraPagina - margem, yInfo, { align: "right" });
 
-        // --- CONTINUE O PDF A PARTIR DE yInfo + 20 ---
-        let y = yInfo + 20;
-
-        // --- DADOS DO CLIENTE ---
-        const xLabel = margem;
-        const xValue = margem + 70;
-        const espacamentoLinha = 14;
+        // --- DADOS DO CLIENTE EM NEGRITO, MAIS BONITOS ---
+        let y = yInfo + 22;
+        doc.setFontSize(16);
+        doc.setFont("Helvetica", "bold");
+        doc.text("Cliente:", margem, y);
+        doc.setFont("Helvetica", "normal");
+        doc.text(nome, margem + 90, y);
+        y += 22;
 
         doc.setFont("Helvetica", "bold");
-        doc.text("Cliente:", xLabel, y);
+        doc.text("CNPJ/CPF:", margem, y);
         doc.setFont("Helvetica", "normal");
-        doc.text(nome, xValue, y);
-        y += espacamentoLinha;
+        doc.text(cnpj, margem + 90, y);
+        y += 22;
 
         doc.setFont("Helvetica", "bold");
-        doc.text("CNPJ/CPF:", xLabel, y);
+        doc.text("Telefone:", margem, y);
         doc.setFont("Helvetica", "normal");
-        doc.text(cnpj, xValue, y);
-        y += espacamentoLinha;
+        doc.text(tel, margem + 90, y);
+        y += 22;
 
         doc.setFont("Helvetica", "bold");
-        doc.text("Telefone:", xLabel, y);
+        doc.text("E-mail:", margem, y);
         doc.setFont("Helvetica", "normal");
-        doc.text(tel, xValue, y);
-        y += espacamentoLinha;
-
-        doc.setFont("Helvetica", "bold");
-        doc.text("E-mail:", xLabel, y);
-        doc.setFont("Helvetica", "normal");
-        doc.text(email, xValue, y);
-        y += espacamentoLinha + 6;
+        doc.text(email, margem + 90, y);
+        y += 28;
 
         // --- TABELA DE ITENS ---
         const colWidths = [
