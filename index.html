@@ -647,7 +647,10 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         doc.setFontSize(34);
         doc.setFont("Helvetica", "bold");
         doc.setTextColor(0, 0, 0);
-        doc.text(`PROPOSTA COMERCIAL ${numOrcamento}`, larguraPagina / 2 + 20, 58, { align: "center" });
+        doc.text(`PROPOSTA COMERCIAL ${numOrcamento}`,
+      logoLargura + margem + 15, // começa à direita da logo
+      70 // centralizado verticalmente na faixa
+    );
 
         // --- INFORMAÇÕES DA DIFF ABAIXO DA FAIXA CINZA, FONTE SIZE 11 ---
         doc.setFontSize(11);
@@ -663,7 +666,7 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
 
         // --- DADOS DO CLIENTE EM NEGRITO, MAIS BONITOS ---
         let y = yInfo + 22;
-        doc.setFontSize(16);
+        doc.setFontSize(11);
         doc.setFont("Helvetica", "bold");
         doc.text("Cliente:", margem, y);
         doc.setFont("Helvetica", "normal");
