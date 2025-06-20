@@ -679,32 +679,32 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
 
         // --- DADOS DO CLIENTE EM NEGRITO, MAIS BONITOS ---
         let y = yInfo + 16;
-        const lineGap = 10;
+        const lineGap = 13;
 
         doc.setFontSize(11);
 
         doc.setFont("Helvetica", "bold");
         doc.text("Cliente:", margem, y);
         doc.setFont("Helvetica", "normal");
-        doc.text(nome, margem + 60, y);
+        doc.text(nome, margem + 70, y);
         y += lineGap;
 
         doc.setFont("Helvetica", "bold");
         doc.text("CNPJ/CPF:", margem, y);
         doc.setFont("Helvetica", "normal");
-        doc.text(cnpj, margem + 60, y);
+        doc.text(cnpj, margem + 70, y);
         y += lineGap;
 
         doc.setFont("Helvetica", "bold");
         doc.text("Telefone:", margem, y);
         doc.setFont("Helvetica", "normal");
-        doc.text(tel, margem + 60, y);
+        doc.text(tel, margem + 70, y);
         y += lineGap;
 
         doc.setFont("Helvetica", "bold");
         doc.text("E-mail:", margem, y);
         doc.setFont("Helvetica", "normal");
-        doc.text(email, margem + 60, y);
+        doc.text(email, margem + 70, y);
         y += lineGap;
 
         // --- TABELA DE ITENS ---
