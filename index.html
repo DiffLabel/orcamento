@@ -749,8 +749,8 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
           const cor = item.querySelector(".cores").value;
           const larguraInput = parseFloat(item.querySelector(".largura").value);
           const alturaInput = parseFloat(item.querySelector(".altura").value);
-          const largura = isNaN(larguraInput) ? 0 : larguraInput;
-          const altura = isNaN(alturaInput) ? 0 : alturaInput;
+          const largura = isNaN(larguraInput) ? 0 : larguraInput + 4;
+          const altura = isNaN(alturaInput) ? 0 : alturaInput + 4;
           const qtdeInput = parseInt(item.querySelector(".quantidade").value);
           const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
           const precoInput = parseFloat(item.querySelector(".preco").value);
