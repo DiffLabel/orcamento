@@ -874,7 +874,7 @@ const dataHoje = new Date();
 const dataStr = dataHoje.toLocaleDateString('pt-BR').replace(/\//g, '-');
 // Remove caracteres inválidos do nome do cliente
 const nomeClienteLimpo = nome.replace(/[\\/:*?"<>|]/g, '').trim();
-const nomeArquivo = `Proposta Comercial - ${numOrcamento} - ${nomeClienteLimpo} - ${dataStr}.pdf`;
+const nomeArquivo = `Proposta Comercial ${numOrcamento} - ${nomeClienteLimpo} - ${dataStr}.pdf`;
 
 doc.save(nomeArquivo);
       } finally {
