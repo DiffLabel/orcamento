@@ -869,7 +869,14 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         doc.setDrawColor(180);
         doc.line(margem, y + 10, larguraPagina - margem, y + 10);
 
-        doc.save(`Proposta_Comercial_${numOrcamento}.pdf`);
+        // Formata a data como DD-MM-YYYY
+const dataHoje = new Date();
+const dataStr = dataHoje.toLocaleDateString('pt-BR').replace(/\//g, '-');
+// Remove caracteres inválidos do nome do cliente
+const nomeClienteLimpo = nome.replace(/[\\/:*?"<>|]/g, '').trim();
+const nomeArquivo = `Proposta Comercial - ${numOrcamento} - ${nomeClienteLimpo} - ${dataStr}.pdf`;
+
+doc.save(nomeArquivo);
       } finally {
         setTimeout(mostrarContadoresArea, 100);
       }
