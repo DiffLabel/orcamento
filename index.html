@@ -742,65 +742,71 @@ Haverá atualização de valor, caso formato/quantidade final do rótulo seja di
         doc.setFont("Helvetica", "normal");
         let totalGeral = 0;
 
-        document.querySelectorAll(".item").forEach((item, i) => {
-          const identificacao = item.querySelector(".identificacaoCliente").value.trim() || `Item ${i+1}`;
-          const material = item.querySelector(".material").value;
-          const acabamento = item.querySelector(".acabamento").value;
-          const cor = item.querySelector(".cores").value;
-          const larguraInput = parseFloat(item.querySelector(".largura").value);
-          const alturaInput = parseFloat(item.querySelector(".altura").value);
-          const largura = isNaN(larguraInput) ? 0 : larguraInput + 4;
-          const altura = isNaN(alturaInput) ? 0 : alturaInput + 4;
-          const qtdeInput = parseInt(item.querySelector(".quantidade").value);
-          const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
-          const precoInput = parseFloat(item.querySelector(".preco").value);
-          const preco = isNaN(precoInput) ? 0 : precoInput;
-          const sku = item.querySelector(".sku").value || "-";
-          const obs = item.querySelector(".obs").value;
-          const area = (largura * altura) / 1000000;
-          const areaTotal = area * qtde;
-          const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
-            ? 225
-            : areaTotal * preco;
-          const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : "0.0000";
+    document.querySelectorAll(".item").forEach((item, i) => {
+  const identificacao = item.querySelector(".identificacaoCliente").value.trim() || `Item ${i+1}`;
+  const material = item.querySelector(".material").value;
+  const acabamento = item.querySelector(".acabamento").value;
+  const cor = item.querySelector(".cores").value;
+  const larguraInput = parseFloat(item.querySelector(".largura").value);
+  const alturaInput = parseFloat(item.querySelector(".altura").value);
+  const largura = isNaN(larguraInput) ? 0 : larguraInput + 4; // para cálculo, mantém sangria
+  const altura = isNaN(alturaInput) ? 0 : alturaInput + 4;    // para cálculo, mantém sangria
+  const qtdeInput = parseInt(item.querySelector(".quantidade").value);
+  const qtde = isNaN(qtdeInput) ? 0 : qtdeInput;
+  const precoInput = parseFloat(item.querySelector(".preco").value);
+  const preco = isNaN(precoInput) ? 0 : precoInput;
+  const sku = item.querySelector(".sku").value || "-";
+  const obs = item.querySelector(".obs").value;
+  const area = (largura * altura) / 1000000;
+  const areaTotal = area * qtde;
+  const valorTotal = (material.includes("Vinil") && areaTotal < 5 && qtde <= 2000)
+    ? 225
+    : areaTotal * preco;
+  const valorUnitario = qtde > 0 ? (valorTotal / qtde).toFixed(4) : "0.0000";
 
-          totalGeral += valorTotal;
+  totalGeral += valorTotal;
 
-          const descText = `${identificacao}\nMaterial: ${material}\nFormato: ${largura.toFixed(0)}×${altura.toFixed(0)} mm\nSKU: ${sku}\nCores: ${cor}\nAcab: ${acabamento}`;
-          const descLines = doc.splitTextToSize(descText, colWidths[1] - 10);
-          const lineHeight = 12;
-          const rowHeight = descLines.length * lineHeight + 10;
+  // ALTERAÇÃO AQUI: usar larguraInput e alturaInput para exibir no PDF
+  const descText = `${identificacao}
+Material: ${material}
+Formato: ${isNaN(larguraInput) ? 0 : larguraInput.toFixed(0)}×${isNaN(alturaInput) ? 0 : alturaInput.toFixed(0)} mm
+SKU: ${sku}
+Cores: ${cor}
+Acab: ${acabamento}`;
+  const descLines = doc.splitTextToSize(descText, colWidths[1] - 10);
+  const lineHeight = 12;
+  const rowHeight = descLines.length * lineHeight + 10;
 
-          if (y + rowHeight > 750) {
-            doc.addPage();
-            y = 40;
-          }
+  if (y + rowHeight > 750) {
+    doc.addPage();
+    y = 40;
+  }
 
-          if (i % 2 === 0) {
-            doc.setFillColor(250, 250, 250);
-            doc.rect(margem, y - 2, larguraUtil, rowHeight, 'F');
-          }
+  if (i % 2 === 0) {
+    doc.setFillColor(250, 250, 250);
+    doc.rect(margem, y - 2, larguraUtil, rowHeight, 'F');
+  }
 
-          doc.setTextColor(0, 0, 0);
-          doc.setFont("Helvetica", "bold");
-          doc.text(String(i+1), x + 5, y + 12);
-          doc.setFont("Helvetica", "normal");
-          doc.text(descLines, x + colWidths[0] + 5, y + 12);
-          doc.text(String(qtde), x + colWidths[0] + colWidths[1] + 15, y + 12);
-          doc.text("Un.", x + colWidths[0] + colWidths[1] + colWidths[2] + 5, y + 12);
-          doc.text(`R$ ${valorUnitario}`, x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + 5, y + 12);
-          doc.text(`R$ ${valorTotal.toFixed(2)}`, x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] + 5, y + 12);
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("Helvetica", "bold");
+  doc.text(String(i+1), x + 5, y + 12);
+  doc.setFont("Helvetica", "normal");
+  doc.text(descLines, x + colWidths[0] + 5, y + 12);
+  doc.text(String(qtde), x + colWidths[0] + colWidths[1] + 15, y + 12);
+  doc.text("Un.", x + colWidths[0] + colWidths[1] + colWidths[2] + 5, y + 12);
+  doc.text(`R$ ${valorUnitario}`, x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + 5, y + 12);
+  doc.text(`R$ ${valorTotal.toFixed(2)}`, x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] + 5, y + 12);
 
-          doc.setDrawColor(200);
-          doc.setLineWidth(0.5);
-          doc.rect(x, y - 2, colWidths[0], rowHeight, "S");
-          doc.rect(x + colWidths[0], y - 2, colWidths[1], rowHeight, "S");
-          doc.rect(x + colWidths[0] + colWidths[1], y - 2, colWidths[2], rowHeight, "S");
-          doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2], y - 2, colWidths[3], rowHeight, "S");
-          doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3], y - 2, colWidths[4], rowHeight, "S");
-          doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4], y - 2, colWidths[5], rowHeight, "S");
+  doc.setDrawColor(200);
+  doc.setLineWidth(0.5);
+  doc.rect(x, y - 2, colWidths[0], rowHeight, "S");
+  doc.rect(x + colWidths[0], y - 2, colWidths[1], rowHeight, "S");
+  doc.rect(x + colWidths[0] + colWidths[1], y - 2, colWidths[2], rowHeight, "S");
+  doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2], y - 2, colWidths[3], rowHeight, "S");
+  doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3], y - 2, colWidths[4], rowHeight, "S");
+  doc.rect(x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4], y - 2, colWidths[5], rowHeight, "S");
 
-          y += rowHeight + 4;
+  y += rowHeight + 4;
         });
 
         if (y > 750) {
